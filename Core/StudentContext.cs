@@ -15,7 +15,7 @@ namespace Core
         [Key]
         [System.ComponentModel.DataAnnotations.Schema.DatabaseGenerated(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.None)]
         public long StudentID { get; set; }
-        public int? Card { get; set; }
+        public int? CardID { get; set; }
         public int CardTypeID { get; set; }
         public string Name { get; set; }
         public double Balance { get; set; }
@@ -34,7 +34,7 @@ namespace Core
 
         public override string ToString()//Debug
         {
-            return $"{Name}[{StudentID}]:{Card}{{{Balance},{Apple}}}{LastUpdated}";
+            return $"{Name}[{StudentID}]:{CardID}{{{Balance},{Apple}}}{LastUpdated}";
         }
     }
 
