@@ -10,6 +10,8 @@ namespace Core
     {
         static void Main(string[] args)
         {
+            var db = new StudentContext();
+            db.SaveChanges();
         }
     }
 }
