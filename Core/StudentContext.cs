@@ -27,14 +27,14 @@ namespace Core
         public string School { get; set; }
         public double TotalMoney { get; set; }
         public DateTime? StartDate { get; set; }
-        public DateTime? LastUpdated { get; set; }
+        public DateTime? LastSignIn { get; set; }
         public string Remarks { get; set; }
 
         public virtual CardType CardType { get; set; }
 
         public override string ToString()//Debug
         {
-            return $"{Name}[{StudentID}]:{CardID}{{{Balance},{Apple}}}{LastUpdated}";
+            return $"{Name}[{StudentID}]:{CardID}{{{Balance},{Apple}}}{LastSignIn}";
         }
     }
 
