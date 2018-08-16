@@ -25,6 +25,7 @@ namespace Core
         public int? Age { get; set; }
         public DateTime? Birthday { get; set; }
         public string School { get; set; }
+        public string Address { get; set; }
         public double TotalMoney { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? LastSignIn { get; set; }

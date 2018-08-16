@@ -25,6 +25,20 @@ namespace Core
             }
         }
         public bool HasReward { get; private set; }
+        public bool HasSignIn
+        {
+            get
+            {
+                if (student == null || student.LastSignIn == null)
+                    return false;
+
+                DateTime dt = student.LastSignIn.Value;
+                DateTime now = DateTime.Now;
+                return dt.Year == now.Year
+                    && dt.Month == now.Month
+                    && dt.Day == now.Day;
+            }
+        }
 
         /// <summary>
         /// 按StudentID尝试查找学生
@@ -99,6 +113,45 @@ namespace Core
             }
         }
 
+        private void MoneyAdd(Student student,double money)
+        {
+            using (var db = new StudentContext())
+            {
+                db.Students.Attach(student);
+                student.Balance += money;
+                db.SaveChanges();
+            }
+        }
+        public bool DepositMoney(double Money)
+        {
+            if (student == null || Money <= 0)
+                return false;
+
+            MoneyAdd(student, Money);
+            Record("充值", student, Money);//Fixed
+            return true;
+        }
+        public bool DepositMoneyByMonth(int Month)
+        {
+            if (student == null || Month <= 0)
+                return false;
+
+            double money = Month * student.CardType.MonthlyFee;
+            MoneyAdd(student, money);
+            Record("充值", student, money, $"充值{Month}月");//Fixed
+            return true;
+        }
+        public bool DepositMoneyByLesson(int Lesson)
+        {
+            if (student == null || Lesson <= 0)
+                return false;
+
+            double money = Lesson * student.CardType.CostPerLesson;
+            MoneyAdd(student, money);
+            Record("充值", student, money, $"充值{Lesson}节课");//Fixed
+            return true;
+        }
+
         /// <summary>
         /// 卡中取款
         /// </summary>
@@ -154,6 +207,48 @@ namespace Core
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// 回收卡
+        /// </summary>
+        /// <returns></returns>
+        public bool RecoverCard()
+        {
+            if (student == null)
+                return false;
+
+            using (var db = new StudentContext())
+            {
+                db.Students.Attach(student);
+                db.Students.Remove(student);
+            }
+            Record("卡回收", student);//Fixed
+            return true;
+        }
+
+        /// <summary>
+        /// 更换卡
+        /// </summary>
+        /// <param name="NewStudentID">新卡号</param>
+        /// <returns></returns>
+        public bool ReplaceCard(long NewStudentID)
+        {
+            if (student == null)
+                return false;
+
+            using (var db = new StudentContext())
+            {
+                db.Students.Attach(student);
+                db.Students.Remove(student);
+
+                student.StudentID = NewStudentID;
+
+                db.Students.Add(student);
+                db.SaveChanges();
+            }
+            Record("换卡", student);//Fixed
+            return true;
         }
 
         /// <summary>

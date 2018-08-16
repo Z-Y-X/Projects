@@ -15,32 +15,36 @@ namespace Core
             //db.Students.Add(new Student { StudentID = 233, CardTypeID = 1, Name = "Lzy" });
             //db.SaveChanges();
             //Console.WriteLine((from s in db.Settings select s).FirstOrDefault().C);
-            Student student = new Student { StudentID = 233 };
-            db.Students.Attach(student);
-            student.Balance += 999;
+            Student student = new Student { StudentID = 233, Name = "Lzy" };
+            db.Students.Add(student);
+            db.SaveChanges();
+
+            student = db.Students.FirstOrDefault();
+            Console.WriteLine(student.Name);
+            db.Students.Remove(student);
             db.SaveChanges();
             Console.WriteLine(student.Name);
             //Console.ReadKey();
 
-            Core core = new Core();
-            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-            sw.Start();
+            //Core core = new Core();
+            //System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            //sw.Start();
 
-            //耗时巨大的代码
-            for (int i = 0; i < 100; i++)
-            {
-                using (var dbr = new RecordContext())
-                {
-                    Record record = (from r in dbr.Records
-                                     where r.RecordID > 1000
-                                     select r).FirstOrDefault();
-                }
+            ////耗时巨大的代码
+            //for (int i = 0; i < 100; i++)
+            //{
+            //    using (var dbr = new RecordContext())
+            //    {
+            //        Record record = (from r in dbr.Records
+            //                         where r.RecordID > 1000
+            //                         select r).FirstOrDefault();
+            //    }
 
-            }
-                //core.Record("Test");
+            //}
+            //    //core.Record("Test");
 
-            sw.Stop();
-            Console.WriteLine("总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
+            //sw.Stop();
+            //Console.WriteLine("总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
             Console.ReadKey();
 
         }
