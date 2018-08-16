@@ -8,7 +8,77 @@ namespace Core
     public class Core
     {
         private Student student;
+        private Setting settings;
 
+        #region Setting
+        /// <summary>
+        /// 上次正常关闭
+        /// </summary>
+        public bool LastNormalClosed { get; private set; } = true;
+        /// <summary>
+        /// 软件初次启动
+        /// </summary>
+        public bool FirstStartup { get; private set; } = false;
+        /// <summary>
+        /// 加载设置
+        /// </summary>
+        public void LoadSettings()
+        {
+            using (var db = new StudentContext())
+            {
+                var query = from s in db.Settings
+                            select s;
+                settings = query.FirstOrDefault();
+                if (settings == null)
+                {
+                    LastNormalClosed = true;
+                    FirstStartup = true;
+
+                    settings = new Setting();
+                    db.Settings.Add(settings);
+                    db.SaveChanges();
+                }
+                else
+                {
+                    LastNormalClosed = settings.Closed;
+                    FirstStartup = false;
+
+                    settings.Closed = false;
+                    settings.LastStartup = DateTime.Now;
+                }
+            }
+        }
+
+        public void AddCardType(CardType cardType)
+        {
+            using (var db = new StudentContext())
+            {
+                db.CardTypes.Add(cardType);
+                db.SaveChanges();
+            }
+        }
+        public void AddCardType(List<CardType> cardTypes)
+        {
+            using (var db = new StudentContext())
+            {
+                db.CardTypes.AddRange(cardTypes);
+                db.SaveChanges();
+            }
+        }
+        public List<CardType> GetCardTypes()
+        {
+            List<CardType> list;
+            using (var db = new StudentContext())
+            {
+                var query = from c in db.CardTypes
+                            select c;
+                list = query.ToList();
+            }
+            return list;
+        }
+        #endregion
+
+        #region Student
         public Student Student
         {
             get
@@ -24,7 +94,13 @@ namespace Core
                 student = value;
             }
         }
+        /// <summary>
+        /// 当前学生应该得到奖励
+        /// </summary>
         public bool HasReward { get; private set; }
+        /// <summary>
+        /// 当前学生已经签过到了
+        /// </summary>
         public bool HasSignIn
         {
             get
@@ -259,7 +335,9 @@ namespace Core
         //{
         //    return student.Apple % 10 == 0;
         //}
+        #endregion
 
+        #region Record
         /// <summary>
         /// 增加一条学生记录
         /// </summary>
@@ -310,5 +388,6 @@ namespace Core
                 db.SaveChanges();
             }
         }
+        #endregion
     }
 }

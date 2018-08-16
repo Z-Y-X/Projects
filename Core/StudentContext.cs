@@ -42,12 +42,9 @@ namespace Core
     public class Setting//TODO 未完成
     {
         public int ID { get; set; }
-        public int C { get; set; }
-        public string N { get; set; }
-        public double B { get; set; }
-        public int A { get; set; }
+        public bool Closed { get; set; } = false;
 
-        public DateTime TimeSpan { get; set; }
+        public DateTime LastStartup { get; set; } = DateTime.Now;
     }
     public class CardType
     {
