@@ -7,10 +7,15 @@ namespace Core
 {
     public class Core
     {
+        public Core()
+        {
+            LoadSettings();
+        }
+
         private Student student;
-        private Setting settings;
 
         #region Setting
+        public Setting Settings { get; private set; } = null;
         /// <summary>
         /// 上次正常关闭
         /// </summary>
@@ -28,23 +33,23 @@ namespace Core
             {
                 var query = from s in db.Settings
                             select s;
-                settings = query.FirstOrDefault();
-                if (settings == null)
+                Settings = query.FirstOrDefault();
+                if (Settings == null)
                 {
                     LastNormalClosed = true;
                     FirstStartup = true;
 
-                    settings = new Setting();
-                    db.Settings.Add(settings);
+                    Settings = new Setting();
+                    db.Settings.Add(Settings);
                     db.SaveChanges();
                 }
                 else
                 {
-                    LastNormalClosed = settings.Closed;
+                    LastNormalClosed = Settings.Closed;
                     FirstStartup = false;
 
-                    settings.Closed = false;
-                    settings.LastStartup = DateTime.Now;
+                    Settings.Closed = false;
+                    Settings.LastStartup = DateTime.Now;
                 }
             }
         }
