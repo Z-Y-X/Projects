@@ -1,7 +1,10 @@
 
 Core/.vs/
-
 Core/bin/
-
 Core/obj/
-WpfApp/
+
+Wpf/
+
+GUI/.vs/
+GUI/bin/
+GUI/obj/

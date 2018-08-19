@@ -10,14 +10,14 @@ namespace Core
     {
         static void Main(string[] args)
         {
-            //var db = new StudentContext();
-            ////db.Settings.Add(new Setting { C = 888 });
-            ////db.Students.Add(new Student { StudentID = 233, CardTypeID = 1, Name = "Lzy" });
-            ////db.SaveChanges();
-            ////Console.WriteLine((from s in db.Settings select s).FirstOrDefault().C);
-            //Student student = new Student { StudentID = 233, Name = "Lzy" };
-            //db.Students.Add(student);
+            var db = new StudentContext();
+            //db.Settings.Add(new Setting { C = 888 });
+            //db.Students.Add(new Student { StudentID = 233, CardTypeID = 1, Name = "Lzy" });
             //db.SaveChanges();
+            //Console.WriteLine((from s in db.Settings select s).FirstOrDefault().C);
+            Student student = new Student { StudentID = 233, Name = "Lzy" };
+            db.Students.Add(student);
+            db.SaveChanges();
 
             //student = db.Students.FirstOrDefault();
             //Console.WriteLine(student.Name);
@@ -47,8 +47,8 @@ namespace Core
             ////Console.WriteLine("总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
 
 
-            System.Windows.Controls.PrintDialog print = new System.Windows.Controls.PrintDialog();
-            print.ShowDialog();
+            //System.Windows.Controls.PrintDialog print = new System.Windows.Controls.PrintDialog();
+            //print.ShowDialog();
             Console.ReadKey();
 
         }

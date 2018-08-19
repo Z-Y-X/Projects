@@ -44,6 +44,7 @@ namespace Core
         public int ID { get; set; }
         public bool Closed { get; set; } = false;
         public int CardIDMax { get; set; } = 10000;
+        public string MainName { get; set; }
 
         public DateTime LastStartup { get; set; } = DateTime.Now;
     }
