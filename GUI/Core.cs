@@ -312,8 +312,45 @@ namespace Core
                 db.Students.Remove(student);
                 db.SaveChanges();
             }
-            Record("卡回收", student);//Fixed
+            Record("回收", student);//Fixed
             return true;
+        }
+
+        public bool HasContainStudent(long StudentID)
+        {
+            int count = 0;
+            using (var db = new StudentContext())
+            {
+                var query = from s in db.Students
+                            where s.StudentID == StudentID
+                            select s;
+                count = query.Count();
+            }
+            return count != 0;
+        }
+        public bool HasContainStudent(string Name)
+        {
+            int count = 0;
+            using (var db = new StudentContext())
+            {
+                var query = from s in db.Students
+                            where s.Name == Name
+                            select s;
+                count = query.Count();
+            }
+            return count != 0;
+        }
+        public bool HasContainStudent(int CardID)
+        {
+            int count = 0;
+            using (var db = new StudentContext())
+            {
+                var query = from s in db.Students
+                            where s.CardID == CardID
+                            select s;
+                count = query.Count();
+            }
+            return count != 0;
         }
 
         /// <summary>
@@ -328,8 +365,15 @@ namespace Core
 
             using (var db = new StudentContext())
             {
+                var query = from s in db.Students
+                            where s.StudentID == NewStudentID
+                            select s;
+                if (query.Count() != 0)//确保不会因重复而误删除
+                    return false;
+
                 db.Students.Attach(student);
                 db.Students.Remove(student);
+                db.SaveChanges();
 
                 student.StudentID = NewStudentID;
 

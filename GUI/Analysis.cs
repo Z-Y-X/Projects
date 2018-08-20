@@ -81,6 +81,20 @@ namespace Core
         /// 统计签到人数
         /// </summary>
         /// <returns></returns>
+        public int Count(DateTime begin,DateTime end)
+        {
+            end = end.AddDays(1);
+            int count = 0;
+            using (var db = new RecordContext())
+            {
+                var query = from r in db.Records
+                            where r.RecordType == "签到"//Fixed
+                                 && begin <= r.Timestamp && r.Timestamp < end
+                            select r;
+                count = query.Count();
+            }
+            return count;
+        }
         public int Count(int Year, int Month,int Day)
         {
             int count = 0;
@@ -141,6 +155,20 @@ namespace Core
         /// 统计总签到收入
         /// </summary>
         /// <returns></returns>
+        public double SignInEarning(DateTime begin, DateTime end)
+        {
+            end = end.AddDays(1);
+            double sum = 0;
+            using (var db = new RecordContext())
+            {
+                var query = from r in db.Records
+                            where r.RecordType == "签到"//Fixed
+                                 && begin <= r.Timestamp && r.Timestamp < end
+                            select r;
+                sum = query.Sum(r => r.Money) ?? 0;
+            }
+            return sum;
+        }
         public double SignInEarning(int Year, int Month, int Day)
         {
             double sum = 0;
@@ -200,6 +228,20 @@ namespace Core
         /// 统计总消费收入
         /// </summary>
         /// <returns></returns>
+        public double ConsumeEarning(DateTime begin, DateTime end)
+        {
+            end = end.AddDays(1);
+            double sum = 0;
+            using (var db = new RecordContext())
+            {
+                var query = from r in db.Records
+                            where r.RecordType == "消费"//Fixed
+                                 && begin <= r.Timestamp && r.Timestamp < end
+                            select r;
+                sum = query.Sum(r => r.Money) ?? 0;
+            }
+            return sum;
+        }
         public double ConsumeEarning(int Year, int Month, int Day)
         {
             double sum = 0;
@@ -259,6 +301,20 @@ namespace Core
         /// 统计总充值金额
         /// </summary>
         /// <returns></returns>
+        public double TotalDeposit(DateTime begin, DateTime end)
+        {
+            end = end.AddDays(1);
+            double sum = 0;
+            using (var db = new RecordContext())
+            {
+                var query = from r in db.Records
+                            where r.RecordType == "充值"//Fixed
+                                 && begin <= r.Timestamp && r.Timestamp < end
+                            select r;
+                sum = query.Sum(r => r.Money) ?? 0;
+            }
+            return sum;
+        }
         public double TotalDeposit(int Year, int Month, int Day)
         {
             double sum = 0;
@@ -318,6 +374,25 @@ namespace Core
         /// 统计总取款金额
         /// </summary>
         /// <returns></returns>
+        public double TotalWithdraw(DateTime begin, DateTime end)
+        {
+            end = end.AddDays(1);
+            double sum = 0;
+            using (var db = new RecordContext())
+            {
+                var query = from r in db.Records
+                            where r.RecordType == "取款"//Fixed
+                                 && begin <= r.Timestamp && r.Timestamp < end
+                            select r;
+
+                List<Record> records = new List<Record>();
+                var quer = from r in db.Records
+                            where records.Contains(r)
+                            select r;
+                sum = query.Sum(r => r.Money) ?? 0;
+            }
+            return sum;
+        }
         public double TotalWithdraw(int Year, int Month, int Day)
         {
             double sum = 0;

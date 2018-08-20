@@ -47,7 +47,7 @@
         </Grid>
         <TabControl x:Name="Main_Tab" Grid.Row="3" Margin="4">
             <TabItem Header="首页">
-                
+
             </TabItem>
             <TabItem Header="签到" TabIndex="1">
                 <Grid DataContext="{Binding Path=DataContext,ElementName=Strudent_Date}">
@@ -97,7 +97,7 @@
                     <TextBox Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="3" Margin="4" Text="{Binding Apple}" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEdit}"/>
                     <Label Content="余额" Grid.Column="0" Grid.Row="3" Margin="4" />
                     <TextBox Grid.Column="1" Grid.Row="3" MinWidth="50" Margin="4" Text="{Binding Balance,StringFormat='F2'}" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEdit}"/>
-                    <Label Content="课" Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="2" Margin="4" />
+                    <!--Label Content="课" Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="2" Margin="4" /-->
                     <Label Content="电话" Grid.Column="0" Grid.Row="4" Margin="4" />
                     <TextBox Grid.Column="1" Grid.Row="4" MinWidth="50" Grid.ColumnSpan="3" Margin="4" Text="{Binding PhoneNumber}" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEdit}"/>
                     <Label Content="地址" Grid.Column="0" Grid.Row="5" Margin="4" />
@@ -156,23 +156,25 @@
                                 <ColumnDefinition Width="2*"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
                             <Label Content="总金" Grid.Column="0" Grid.Row="0" Margin="4" />
-                            <TextBox x:Name="DepositMoney_TextBox"  Grid.Column="1" Grid.Row="0" MinWidth="50" Margin="4" TextChanged="DepositMoney_TextBox_TextChanged" Text="{Binding DepositMoney}"/>
+                            <TextBox x:Name="DepositMoney_TextBox"  Grid.Column="1" Grid.Row="0" MinWidth="50" Margin="4" TextChanged="DepositMoney_TextBox_TextChanged" />
                             <Label Content="元" Grid.Column="2" Grid.Row="0" Margin="4" />
-                            <Label Grid.Column="3" Grid.Row="0" Margin="4" />
+                            <Label Grid.Column="3" Grid.Row="0" Margin="4" ContentStringFormat="当前余额{0:F2}元" Content="{Binding Balance}"/>
 
                             <Label Content="月份" Grid.Column="0" Grid.Row="1" Margin="4" />
                             <TextBox x:Name="DepositMonth_TextBox"  Grid.Column="1" Grid.Row="1" MinWidth="50" Margin="4" TextChanged="DepositMonth_TextBox_TextChanged"/>
                             <Label Content="个月" Grid.Column="2" Grid.Row="1" Margin="4" />
-                            
-                            <Label Content="" Grid.Column="0" Grid.Row="3" Margin="4" />
+
+                            <Label Content="课程" Grid.Column="0" Grid.Row="2" Margin="4" />
+                            <TextBox x:Name="DepositLesson_TextBox"  Grid.Column="1" Grid.Row="2" MinWidth="50" Margin="4" TextChanged="DepositLesson_TextBox_TextChanged"/>
+                            <Label Content="节" Grid.Column="2" Grid.Row="2" Margin="4" />
 
                             <Button x:Name="Deposit_Button" Content="交费" Grid.Column="4" Grid.Row="0" MinWidth="50" Margin="4" Click="Deposit_Button_Click" IsEnabled="False"/>
                             <Button x:Name="Withdraw_Button" Content="取款" Grid.Column="4" Grid.Row="1" MinWidth="50" Margin="4" IsEnabled="{Binding Path=IsEnabled,ElementName=Deposit_Button}" Click="Withdraw_Button_Click"/>
-                            <Button x:Name="Consume_Button" Content="消费" Grid.Column="4" Grid.Row="2" MinWidth="50" Margin="4" IsEnabled="{Binding Path=IsEnabled,ElementName=Deposit_Button}" Height="{Binding Path=Height,ElementName=Deposit_Button}" Click="Consume_Button_Click"/>
+                            <Button x:Name="Consume_Button" Content="消费" Grid.Column="4" Grid.Row="2" MinWidth="50" Margin="4" IsEnabled="{Binding Path=IsEnabled,ElementName=Deposit_Button}" Click="Consume_Button_Click"/>
                         </Grid>
                     </GroupBox>
                     <GroupBox Header="苹果园" Grid.Column="0" Grid.Row="1">
-                        <Grid>
+                        <Grid DataContext="{Binding Path=DataContext,ElementName=Strudent_Date}">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"></RowDefinition>
                                 <RowDefinition Height="Auto"></RowDefinition>
@@ -183,17 +185,17 @@
                                 <ColumnDefinition Width="1*"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
                             <Label Content="苹果" Grid.Column="0" Grid.Row="0" Margin="4" />
-                            <TextBox  Grid.Column="1" Grid.Row="0" MinWidth="50" Margin="4" IsEnabled="{Binding CardType,TargetNullValue=False}"/>
+                            <Label  Grid.Column="1" Grid.Row="0" MinWidth="50" Margin="4" Content="{Binding Apple}" ContentStringFormat=" {0} "/>
 
                             <Label Content="数量" Grid.Column="0" Grid.Row="1" Margin="4" />
-                            <TextBox  Grid.Column="1" Grid.Row="1" MinWidth="50" Margin="4"/>
+                            <TextBox x:Name="Apple_TextBox"  Grid.Column="1" Grid.Row="1" MinWidth="50" Margin="4" TextChanged="Apple_TextBox_TextChanged"/>
 
-                            <Button Content="奖励" Grid.Column="3" Grid.Row="0" MinWidth="50" Margin="4"/>
-                            <Button Content="扣除" Grid.Column="3" Grid.Row="1" MinWidth="50" Margin="4"/>
+                            <Button x:Name="AppleAdd_Button" Content="奖励" Grid.Column="3" Grid.Row="0" MinWidth="50" Margin="4" IsEnabled="False" Click="AppleAdd_Button_Click"/>
+                            <Button x:Name="AppleSub_Button" Content="扣除" Grid.Column="3" Grid.Row="1" MinWidth="50" Margin="4" IsEnabled="{Binding IsEnabled, ElementName=AppleAdd_Button}" Click="AppleSub_Button_Click"/>
                         </Grid>
                     </GroupBox>
                     <GroupBox Header="卡操作" Grid.Column="0" Grid.Row="2">
-                        <Grid>
+                        <Grid DataContext="{Binding Path=DataContext,ElementName=Strudent_Date}">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"></RowDefinition>
                                 <RowDefinition Height="Auto"></RowDefinition>
@@ -204,12 +206,12 @@
                                 <ColumnDefinition Width="1*"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
                             <Label Content="新卡号" Grid.Column="0" Grid.Row="0" Margin="4" />
-                            <TextBox  Grid.Column="1" Grid.Row="0" MinWidth="50" Margin="4"/>
-                            <Button x:Name="Replace_Button" Content="换卡" Grid.Column="3" Grid.Row="0" MinWidth="50" Margin="4"/>
+                            <TextBox x:Name="NewStudentID_TextBox"  Grid.Column="1" Grid.Row="0" MinWidth="50" Margin="4" TextChanged="NewStudentID_TextBox_TextChanged"/>
+                            <Button x:Name="Replace_Button" Content="换卡" Grid.Column="3" Grid.Row="0" MinWidth="50" Margin="4" Click="Replace_Button_Click" IsEnabled="False"/>
 
-                            <Label Content="余额" Grid.Column="0" Grid.Row="1" Margin="4" />
-                            <TextBox  Grid.Column="1" Grid.Row="1" MinWidth="50" Margin="4"/>
-                            <Button x:Name="Recover_Button" Content="回收" Grid.Column="3" Grid.Row="1" MinWidth="50" Margin="4"/>
+                            <Label Content="" Grid.Column="0" Grid.Row="1" Margin="4" />
+                            <Label  Grid.Column="1" Grid.Row="1" MinWidth="50" Margin="4" Content="{Binding Balance}" ContentStringFormat="当前余额 {0:F2} 元"/>
+                            <Button x:Name="Recover_Button" Content="回收" Grid.Column="3" Grid.Row="1" MinWidth="50" Margin="4" Click="Recover_Button_Click"/>
 
                         </Grid>
                     </GroupBox>
@@ -227,7 +229,7 @@
                         <ColumnDefinition Width="*"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <GroupBox Header="今日" Grid.Column="0" Grid.Row="0">
-                        <Grid>
+                        <Grid x:Name="TodayAnalysis_Data">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"></RowDefinition>
                                 <RowDefinition Height="Auto"></RowDefinition>
@@ -236,39 +238,39 @@
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
                                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                                 <ColumnDefinition Width="*"></ColumnDefinition>
-                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
                                 <ColumnDefinition Width="*"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
                             <Label Content="签到" Grid.Column="0" Grid.Row="0" Margin="4" />
-                            <TextBox  Grid.Column="1" Grid.Row="0" MinWidth="50" Margin="4"/>
+                            <Label  Grid.Column="1" Grid.Row="0" MinWidth="50" Margin="4" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Content="{Binding SignInCount}"/>
                             <Label Content="人" Grid.Column="2" Grid.Row="0" Margin="4" />
                             <Label Content="合计" Grid.Column="3" Grid.Row="0" Margin="4" HorizontalAlignment="Right"/>
-                            <TextBox  Grid.Column="4" Grid.Row="0" MinWidth="50" Margin="4"/>
+                            <Label  Grid.Column="4" Grid.Row="0" MinWidth="50" Margin="4" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Content="{Binding SignInEarning}" ContentStringFormat="F2"/>
                             <Label Content="元" Grid.Column="5" Grid.Row="0" Margin="4" />
 
                             <Label Content="交费" Grid.Column="0" Grid.Row="1" Margin="4" />
-                            <TextBox  Grid.Column="1" Grid.Row="1" MinWidth="50" Margin="4"/>
+                            <Label  Grid.Column="1" Grid.Row="1" MinWidth="50" Margin="4" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Content="{Binding DepositEarning}" ContentStringFormat="F2"/>
                             <Label Content="元" Grid.Column="2" Grid.Row="1" Margin="4" />
                             <Label Content="消费" Grid.Column="3" Grid.Row="1" Margin="4" HorizontalAlignment="Right"/>
-                            <TextBox  Grid.Column="4" Grid.Row="1" MinWidth="50" Margin="4"/>
+                            <Label  Grid.Column="4" Grid.Row="1" MinWidth="50" Margin="4" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Content="{Binding ConsumeEarning}" ContentStringFormat="F2"/>
                             <Label Content="元" Grid.Column="5" Grid.Row="1" Margin="4" />
 
                             <Label Content="取款" Grid.Column="0" Grid.Row="3" Margin="4" />
-                            <TextBox  Grid.Column="1" Grid.Row="3" MinWidth="50" Margin="4"/>
+                            <Label  Grid.Column="1" Grid.Row="3" MinWidth="50" Margin="4" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Content="{Binding WithdrawEarning}" ContentStringFormat="F2"/>
                             <Label Content="元" Grid.Column="2" Grid.Row="3" Margin="4" />
                             <Label Content="总计收入" Grid.Column="3" Grid.Row="3" Margin="4" HorizontalAlignment="Right"/>
-                            <TextBox  Grid.Column="4" Grid.Row="3" MinWidth="50" Margin="4"/>
+                            <Label  Grid.Column="4" Grid.Row="3" MinWidth="50" Margin="4" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Content="{Binding TotalEarning}" ContentStringFormat="F2"/>
                             <Label Content="元" Grid.Column="5" Grid.Row="3" Margin="4" />
 
-                            <Button Content="刷新" Grid.Column="6" Grid.Row="0" MinWidth="50" Margin="4"/>
+                            <Button x:Name="TodayAnalysis_Button" Content="刷新" Grid.Column="6" Grid.Row="0" MinWidth="50" Margin="4" Click="TodayAnalysis_Button_Click"/>
                         </Grid>
                     </GroupBox>
                     <GroupBox Header="本月" Grid.Column="0" Grid.Row="1">
-                        <Grid>
+                        <Grid x:Name="MonthAnalysis_Data" >
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"></RowDefinition>
                                 <RowDefinition Height="Auto"></RowDefinition>
@@ -277,39 +279,39 @@
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
                                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                                 <ColumnDefinition Width="*"></ColumnDefinition>
-                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
                                 <ColumnDefinition Width="*"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
                             <Label Content="签到" Grid.Column="0" Grid.Row="0" Margin="4" />
-                            <TextBox  Grid.Column="1" Grid.Row="0" MinWidth="50" Margin="4"/>
+                            <Label  Grid.Column="1" Grid.Row="0" MinWidth="50" Margin="4" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Content="{Binding SignInCount}"/>
                             <Label Content="人" Grid.Column="2" Grid.Row="0" Margin="4" />
                             <Label Content="合计" Grid.Column="3" Grid.Row="0" Margin="4" HorizontalAlignment="Right"/>
-                            <TextBox  Grid.Column="4" Grid.Row="0" MinWidth="50" Margin="4"/>
+                            <Label  Grid.Column="4" Grid.Row="0" MinWidth="50" Margin="4" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Content="{Binding SignInEarning}" ContentStringFormat="F2"/>
                             <Label Content="元" Grid.Column="5" Grid.Row="0" Margin="4" />
 
                             <Label Content="交费" Grid.Column="0" Grid.Row="1" Margin="4" />
-                            <TextBox  Grid.Column="1" Grid.Row="1" MinWidth="50" Margin="4"/>
+                            <Label  Grid.Column="1" Grid.Row="1" MinWidth="50" Margin="4" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Content="{Binding DepositEarning}" ContentStringFormat="F2"/>
                             <Label Content="元" Grid.Column="2" Grid.Row="1" Margin="4" />
                             <Label Content="消费" Grid.Column="3" Grid.Row="1" Margin="4" HorizontalAlignment="Right"/>
-                            <TextBox  Grid.Column="4" Grid.Row="1" MinWidth="50" Margin="4"/>
+                            <Label  Grid.Column="4" Grid.Row="1" MinWidth="50" Margin="4" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Content="{Binding ConsumeEarning}" ContentStringFormat="F2"/>
                             <Label Content="元" Grid.Column="5" Grid.Row="1" Margin="4" />
 
                             <Label Content="取款" Grid.Column="0" Grid.Row="3" Margin="4" />
-                            <TextBox  Grid.Column="1" Grid.Row="3" MinWidth="50" Margin="4"/>
+                            <Label  Grid.Column="1" Grid.Row="3" MinWidth="50" Margin="4" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Content="{Binding WithdrawEarning}" ContentStringFormat="F2"/>
                             <Label Content="元" Grid.Column="2" Grid.Row="3" Margin="4" />
                             <Label Content="总计收入" Grid.Column="3" Grid.Row="3" Margin="4" HorizontalAlignment="Right"/>
-                            <TextBox  Grid.Column="4" Grid.Row="3" MinWidth="50" Margin="4"/>
+                            <Label  Grid.Column="4" Grid.Row="3" MinWidth="50" Margin="4" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Content="{Binding TotalEarning}" ContentStringFormat="F2"/>
                             <Label Content="元" Grid.Column="5" Grid.Row="3" Margin="4" />
 
-                            <Button Content="刷新" Grid.Column="6" Grid.Row="0" MinWidth="50" Margin="4"/>
+                            <Button x:Name="MonthAnalysis_Button" Content="刷新" Grid.Column="6" Grid.Row="0" MinWidth="50" Margin="4" Click="MonthAnalysis_Button_Click"/>
                         </Grid>
                     </GroupBox>
-                    <GroupBox Header="今年" Grid.Column="0" Grid.Row="2">
-                        <Grid>
+                    <GroupBox Header="时间段" Grid.Column="0" Grid.Row="2">
+                        <Grid x:Name="Analysis_Data">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"></RowDefinition>
                                 <RowDefinition Height="Auto"></RowDefinition>
@@ -318,35 +320,53 @@
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
                                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                                 <ColumnDefinition Width="*"></ColumnDefinition>
-                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
                                 <ColumnDefinition Width="*"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
-                            <Label Content="签到" Grid.Column="0" Grid.Row="0" Margin="4" />
-                            <TextBox  Grid.Column="1" Grid.Row="0" MinWidth="50" Margin="4"/>
-                            <Label Content="人" Grid.Column="2" Grid.Row="0" Margin="4" />
-                            <Label Content="合计" Grid.Column="3" Grid.Row="0" Margin="4" HorizontalAlignment="Right"/>
-                            <TextBox  Grid.Column="4" Grid.Row="0" MinWidth="50" Margin="4"/>
-                            <Label Content="元" Grid.Column="5" Grid.Row="0" Margin="4" />
+                            <Grid Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="99">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                    <ColumnDefinition Width="7*"></ColumnDefinition>
+                                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                    <ColumnDefinition Width="7*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="4*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="从" Grid.Column="0" Grid.Row="0" Margin="1" />
+                                <DatePicker x:Name="AnalysisBegin_DatePicker"  Grid.Column="1" Grid.Row="0" MinWidth="80" Margin="4"/>
+                                <Label Content="到" Grid.Column="2" Grid.Row="0" Margin="1" />
+                                <DatePicker x:Name="AnalysisEnd_DatePicker" Grid.Column="3" Grid.Row="0"  MinWidth="80" Margin="4" />
+                                <Button x:Name="Analysis_Button" Content="刷新" Grid.Column="5" MinWidth="50" Margin="4" Click="Analysis_Button_Click"/>
+                            </Grid>
 
-                            <Label Content="交费" Grid.Column="0" Grid.Row="1" Margin="4" />
-                            <TextBox  Grid.Column="1" Grid.Row="1" MinWidth="50" Margin="4"/>
-                            <Label Content="元" Grid.Column="2" Grid.Row="1" Margin="4" />
-                            <Label Content="消费" Grid.Column="3" Grid.Row="1" Margin="4" HorizontalAlignment="Right"/>
-                            <TextBox  Grid.Column="4" Grid.Row="1" MinWidth="50" Margin="4"/>
+                            <Label Content="签到" Grid.Column="0" Grid.Row="1" Margin="4" />
+                            <Label  Grid.Column="1" Grid.Row="1" MinWidth="50" Margin="4" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Content="{Binding SignInCount}"/>
+                            <Label Content="人" Grid.Column="2" Grid.Row="1" Margin="4" />
+                            <Label Content="合计" Grid.Column="3" Grid.Row="1" Margin="4" HorizontalAlignment="Right"/>
+                            <Label  Grid.Column="4" Grid.Row="1" MinWidth="50" Margin="4" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Content="{Binding SignInEarning}" ContentStringFormat="F2"/>
                             <Label Content="元" Grid.Column="5" Grid.Row="1" Margin="4" />
 
+                            <Label Content="交费" Grid.Column="0" Grid.Row="2" Margin="4" />
+                            <Label  Grid.Column="1" Grid.Row="2" MinWidth="50" Margin="4" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Content="{Binding DepositEarning}" ContentStringFormat="F2"/>
+                            <Label Content="元" Grid.Column="2" Grid.Row="2" Margin="4" />
+                            <Label Content="消费" Grid.Column="3" Grid.Row="2" Margin="4" HorizontalAlignment="Right"/>
+                            <Label  Grid.Column="4" Grid.Row="2" MinWidth="50" Margin="4" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Content="{Binding ConsumeEarning}" ContentStringFormat="F2"/>
+                            <Label Content="元" Grid.Column="5" Grid.Row="2" Margin="4" />
+
                             <Label Content="取款" Grid.Column="0" Grid.Row="3" Margin="4" />
-                            <TextBox  Grid.Column="1" Grid.Row="3" MinWidth="50" Margin="4"/>
+                            <Label  Grid.Column="1" Grid.Row="3" MinWidth="50" Margin="4" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Content="{Binding WithdrawEarning}" ContentStringFormat="F2"/>
                             <Label Content="元" Grid.Column="2" Grid.Row="3" Margin="4" />
                             <Label Content="总计收入" Grid.Column="3" Grid.Row="3" Margin="4" HorizontalAlignment="Right"/>
-                            <TextBox  Grid.Column="4" Grid.Row="3" MinWidth="50" Margin="4"/>
+                            <Label  Grid.Column="4" Grid.Row="3" MinWidth="50" Margin="4" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Content="{Binding TotalEarning}" ContentStringFormat="F2"/>
                             <Label Content="元" Grid.Column="5" Grid.Row="3" Margin="4" />
 
-                            <Button Content="刷新" Grid.Column="6" Grid.Row="0" MinWidth="50" Margin="4"/>
                         </Grid>
                     </GroupBox>
                 </Grid>
@@ -371,8 +391,8 @@
                     <CheckBox Content="所有学生" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <Label Content="0" Grid.Column="3" Grid.Row="0" Margin="1" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                     <Label Content="条" Grid.Column="4" Grid.Row="0" Margin="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-     
-                    
+
+
                     <Label Content="从" Grid.Column="0" Grid.Row="1" Margin="1" />
                     <DatePicker  Grid.Column="1" Grid.Row="1" MinWidth="80" Margin="4"/>
                     <Label Content="到" Grid.Column="2" Grid.Row="1" Margin="1" />
