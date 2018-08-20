@@ -30,7 +30,7 @@
             <Label Name="Week_Label" Content="{Binding Week,TargetNullValue='星期一'}" Grid.Column="1" Grid.Row="1"  HorizontalAlignment="Center" VerticalContentAlignment="Top"  FontSize="16"/>
         </Grid>
         <Canvas Height="40"  Grid.Row="1" >
-            <Label Content="This is some Message..."  HorizontalAlignment="Center" VerticalContentAlignment="Center"/>
+            <TextBox x:Name="Message_Display" Text="Message" HorizontalAlignment="Center" VerticalContentAlignment="Center" Height="40" Width="443" TextAlignment="Center"/>
         </Canvas>
         <Grid Height="30"  Grid.Row="2" Margin="2">
             <Grid.RowDefinitions>
@@ -42,18 +42,31 @@
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <CheckBox Content="？？？" Grid.Column="0" HorizontalAlignment="Left" VerticalContentAlignment="Center" Margin="2"/>
-            <TextBox Text="在此处输入卡号" Grid.Column="1" VerticalContentAlignment="Center" Margin="4"/>
-            <Button Content="确定" MinWidth="50" Grid.Column="2" HorizontalAlignment="Right" VerticalContentAlignment="Center"  Margin="2"/>
+            <TextBox x:Name="StudentID_TextBox" Text="在此处输入卡号" Grid.Column="1" VerticalContentAlignment="Center" Margin="4"/>
+            <Button x:Name="OK_Button" Content="确定" IsDefault="True" MinWidth="50" Grid.Column="2" HorizontalAlignment="Right" VerticalContentAlignment="Center"  Margin="2" Click="OK_Button_Click"/>
         </Grid>
-        <TabControl Grid.Row="3" Margin="4">
+        <TabControl x:Name="Main_Tab" Grid.Row="3" Margin="4">
             <TabItem Header="首页">
                 
             </TabItem>
-            <TabItem Header="签到">
-
+            <TabItem Header="签到" TabIndex="1">
+                <Grid DataContext="{Binding Path=DataContext,ElementName=Strudent_Date}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Label Content="姓名" Grid.Column="0" Grid.Row="0" Margin="4"/>
+                    <Label Grid.Column="1" Grid.Row="0" MinWidth="50" Margin="4" Content="{Binding Name}"/>
+                </Grid>
             </TabItem>
             <TabItem Header="学生">
-                <Grid>
+                <Grid x:Name="Strudent_Date" >
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
@@ -75,45 +88,46 @@
                         <ColumnDefinition Width="2*"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <Label Content="姓名" Grid.Column="0" Grid.Row="0" Margin="4"/>
-                    <TextBox Grid.Column="1" Grid.Row="0" MinWidth="50" Margin="4"/>
+                    <TextBox x:Name="StudentEdit" Grid.Column="1" Grid.Row="0" MinWidth="50" Margin="4" Text="{Binding Name}" IsEnabled="False"/>
                     <Label Content="卡号" Grid.Column="2" Grid.Row="0" Margin="4" />
-                    <TextBox Grid.Column="3" Grid.Row="0" MinWidth="50" Margin="4"/>
+                    <TextBox Grid.Column="3" Grid.Row="0" MinWidth="50" Margin="4" Text="{Binding CardID}" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEdit}"/>
                     <Label Content="卡号" Grid.Column="0" Grid.Row="1" Margin="4" />
-                    <TextBox Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3" Margin="4"/>
+                    <TextBox Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3" Margin="4" Text="{Binding StudentID}" IsEnabled="False"/>
                     <Label Content="苹果" Grid.Column="0" Grid.Row="2" Margin="4" />
-                    <TextBox Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="3" Margin="4"/>
+                    <TextBox Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="3" Margin="4" Text="{Binding Apple}" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEdit}"/>
                     <Label Content="余额" Grid.Column="0" Grid.Row="3" Margin="4" />
-                    <TextBox Grid.Column="1" Grid.Row="3" MinWidth="50" Margin="4"/>
+                    <TextBox Grid.Column="1" Grid.Row="3" MinWidth="50" Margin="4" Text="{Binding Balance,StringFormat='F2'}" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEdit}"/>
                     <Label Content="课" Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="2" Margin="4" />
                     <Label Content="电话" Grid.Column="0" Grid.Row="4" Margin="4" />
-                    <TextBox Grid.Column="1" Grid.Row="4" MinWidth="50" Grid.ColumnSpan="3" Margin="4"/>
+                    <TextBox Grid.Column="1" Grid.Row="4" MinWidth="50" Grid.ColumnSpan="3" Margin="4" Text="{Binding PhoneNumber}" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEdit}"/>
                     <Label Content="地址" Grid.Column="0" Grid.Row="5" Margin="4" />
-                    <TextBox Grid.Column="1" Grid.Row="5" MinWidth="50" Grid.ColumnSpan="3" Margin="4"/>
+                    <TextBox Grid.Column="1" Grid.Row="5" MinWidth="50" Grid.ColumnSpan="3" Margin="4" Text="{Binding Address}" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEdit}"/>
                     <Label Content="学校" Grid.Column="0" Grid.Row="6" Margin="4" />
-                    <TextBox Grid.Column="1" Grid.Row="6" MinWidth="50" Margin="4"/>
+                    <TextBox Grid.Column="1" Grid.Row="6" MinWidth="50" Margin="4" Text="{Binding School}" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEdit}"/>
                     <Label Content="类型" Grid.Column="2" Grid.Row="6" Margin="4" />
-                    <TextBox Grid.Column="3" Grid.Row="6" MinWidth="50" Margin="4"/>
+                    <TextBox Grid.Column="3" Grid.Row="6" MinWidth="50" Margin="4" Text="{Binding CardType.TypeName}" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEdit}"/>
                     <Label Content="年龄" Grid.Column="0" Grid.Row="7" Margin="4" />
-                    <TextBox Grid.Column="1" Grid.Row="7" MinWidth="50" Margin="4"/>
+                    <TextBox Grid.Column="1" Grid.Row="7" MinWidth="50" Margin="4" Text="{Binding Age}" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEdit}"/>
                     <Label Content="总金" Grid.Column="2" Grid.Row="7" Margin="4" />
-                    <TextBox Grid.Column="3" Grid.Row="7" MinWidth="50" Margin="4"/>
+                    <TextBox Grid.Column="3" Grid.Row="7" MinWidth="50" Margin="4" Text="{Binding TotalMoney,StringFormat='F2'}" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEdit}"/>
 
                     <Label Content="生日" Grid.Column="0" Grid.Row="8" Margin="4" />
-                    <DatePicker Grid.Column="1" Grid.Row="8" MinWidth="50" Margin="4"/>
+                    <DatePicker Grid.Column="1" Grid.Row="8" MinWidth="50" Margin="4" Text="{Binding Birthday,Mode=TwoWay}" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEdit}"/>
                     <Label Content="性别" Grid.Column="2" Grid.Row="8" Margin="4" />
-                    <ComboBox Grid.Column="3" Grid.Row="8" MinWidth="50" Margin="4"/>
+                    <ComboBox Grid.Column="3" Grid.Row="8" MinWidth="50" Margin="4" Text="{Binding Sex}" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEdit}">
+                        <ComboBoxItem>男</ComboBoxItem>
+                        <ComboBoxItem>女</ComboBoxItem>
+                    </ComboBox>
                     <Label Content="开卡" Grid.Column="0" Grid.Row="9" Margin="4" />
-                    <DatePicker Grid.Column="1" Grid.Row="9" MinWidth="50" Margin="4"/>
+                    <DatePicker Grid.Column="1" Grid.Row="9" MinWidth="50" Margin="4" Text="{Binding StartData}" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEdit}"/>
                     <Label Content="上次" Grid.Column="2" Grid.Row="9" Margin="4" />
-                    <DatePicker Grid.Column="3" Grid.Row="9" MinWidth="50" Margin="4"/>
+                    <DatePicker Grid.Column="3" Grid.Row="9" MinWidth="50" Margin="4" Text="{Binding LastSignIn,Mode=TwoWay}" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEdit}"/>
                     <Label Content="备注" Grid.Column="0" Grid.Row="10" Margin="4" />
-                    <TextBox Grid.Column="1" Grid.Row="10" Grid.ColumnSpan="3" MinWidth="50" Margin="4"/>
+                    <TextBox Grid.Column="1" Grid.Row="10" Grid.ColumnSpan="3" MinWidth="50" Margin="4" Text="{Binding Remarks}" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEdit}"/>
 
-                    <Button x:Name="More_Button" Content="详细" Grid.Column="4" Grid.Row="0" MinWidth="50" Margin="4"/>
-                    <Button x:Name="MoreReturn_Button" Content="返回" Grid.Column="4" Grid.Row="1" MinWidth="50" Margin="4"/>
-                    <Button x:Name="Edit_Button" Content="编辑" Grid.Column="4" Grid.Row="2" MinWidth="50" Margin="4"/>
-                    <Button x:Name="EditOK_Button" Content="确定" Grid.Column="4" Grid.Row="3" MinWidth="50" Margin="4"/>
-                    <Button x:Name="EditCancel_Button" Content="取消" Grid.Column="4" Grid.Row="4" MinWidth="50" Margin="4"/>
+                    <Button x:Name="RefreshEdit_Button" Content="刷新" Grid.Column="4" Grid.Row="0" MinWidth="50" Margin="4" Click="RefreshEdit_Button_Click"/>
+                    <Button x:Name="Edit_Button" Content="编辑" Grid.Column="4" Grid.Row="1" MinWidth="50" Margin="4" Click="Edit_Button_Click"/>
+                    <Button x:Name="EditOK_Button" Content="确定" Grid.Column="4" Grid.Row="2" MinWidth="50" Margin="4" Click="EditOK_Button_Click" Visibility="Hidden" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEdit}" />
                 </Grid>
             </TabItem>
             <TabItem Header="功能">
@@ -128,27 +142,33 @@
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <GroupBox Header="卡充值" Grid.Column="0" Grid.Row="0">
-                        <Grid>
+                        <Grid DataContext="{Binding Path=DataContext,ElementName=Strudent_Date}">
                             <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"></RowDefinition>
                                 <RowDefinition Height="Auto"></RowDefinition>
                                 <RowDefinition Height="Auto"></RowDefinition>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                <ColumnDefinition Width="*"></ColumnDefinition>
                                 <ColumnDefinition Width="2*"></ColumnDefinition>
-                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                <ColumnDefinition Width="3*"></ColumnDefinition>
+                                <ColumnDefinition Width="2*"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
                             <Label Content="总金" Grid.Column="0" Grid.Row="0" Margin="4" />
-                            <TextBox  Grid.Column="1" Grid.Row="0" MinWidth="50" Margin="4"/>
+                            <TextBox x:Name="DepositMoney_TextBox"  Grid.Column="1" Grid.Row="0" MinWidth="50" Margin="4" TextChanged="DepositMoney_TextBox_TextChanged" Text="{Binding DepositMoney}"/>
                             <Label Content="元" Grid.Column="2" Grid.Row="0" Margin="4" />
+                            <Label Grid.Column="3" Grid.Row="0" Margin="4" />
 
                             <Label Content="月份" Grid.Column="0" Grid.Row="1" Margin="4" />
-                            <TextBox  Grid.Column="1" Grid.Row="1" MinWidth="50" Margin="4"/>
+                            <TextBox x:Name="DepositMonth_TextBox"  Grid.Column="1" Grid.Row="1" MinWidth="50" Margin="4" TextChanged="DepositMonth_TextBox_TextChanged"/>
                             <Label Content="个月" Grid.Column="2" Grid.Row="1" Margin="4" />
+                            
+                            <Label Content="" Grid.Column="0" Grid.Row="3" Margin="4" />
 
-
-                            <Button Content="交费" Grid.Column="4" Grid.Row="0" MinWidth="50" Margin="4"/>
+                            <Button x:Name="Deposit_Button" Content="交费" Grid.Column="4" Grid.Row="0" MinWidth="50" Margin="4" Click="Deposit_Button_Click" IsEnabled="False"/>
+                            <Button x:Name="Withdraw_Button" Content="取款" Grid.Column="4" Grid.Row="1" MinWidth="50" Margin="4" IsEnabled="{Binding Path=IsEnabled,ElementName=Deposit_Button}" Click="Withdraw_Button_Click"/>
+                            <Button x:Name="Consume_Button" Content="消费" Grid.Column="4" Grid.Row="2" MinWidth="50" Margin="4" IsEnabled="{Binding Path=IsEnabled,ElementName=Deposit_Button}" Height="{Binding Path=Height,ElementName=Deposit_Button}" Click="Consume_Button_Click"/>
                         </Grid>
                     </GroupBox>
                     <GroupBox Header="苹果园" Grid.Column="0" Grid.Row="1">
@@ -163,7 +183,7 @@
                                 <ColumnDefinition Width="1*"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
                             <Label Content="苹果" Grid.Column="0" Grid.Row="0" Margin="4" />
-                            <TextBox  Grid.Column="1" Grid.Row="0" MinWidth="50" Margin="4"/>
+                            <TextBox  Grid.Column="1" Grid.Row="0" MinWidth="50" Margin="4" IsEnabled="{Binding CardType,TargetNullValue=False}"/>
 
                             <Label Content="数量" Grid.Column="0" Grid.Row="1" Margin="4" />
                             <TextBox  Grid.Column="1" Grid.Row="1" MinWidth="50" Margin="4"/>
@@ -185,11 +205,11 @@
                             </Grid.ColumnDefinitions>
                             <Label Content="新卡号" Grid.Column="0" Grid.Row="0" Margin="4" />
                             <TextBox  Grid.Column="1" Grid.Row="0" MinWidth="50" Margin="4"/>
-                            <Button Content="换卡" Grid.Column="3" Grid.Row="0" MinWidth="50" Margin="4"/>
+                            <Button x:Name="Replace_Button" Content="换卡" Grid.Column="3" Grid.Row="0" MinWidth="50" Margin="4"/>
 
                             <Label Content="余额" Grid.Column="0" Grid.Row="1" Margin="4" />
                             <TextBox  Grid.Column="1" Grid.Row="1" MinWidth="50" Margin="4"/>
-                            <Button Content="回收" Grid.Column="3" Grid.Row="1" MinWidth="50" Margin="4"/>
+                            <Button x:Name="Recover_Button" Content="回收" Grid.Column="3" Grid.Row="1" MinWidth="50" Margin="4"/>
 
                         </Grid>
                     </GroupBox>
@@ -370,7 +390,8 @@
                         <CheckBox Content="修改" MinWidth="50" Margin="1"/>
                     </WrapPanel>
 
-                    <DataGrid Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="99" Margin="4" MinHeight="100">
+                    <DataGrid Name="Record_DataGrid" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="99" Margin="4" MinHeight="100" 
+                              AutoGenerateColumns="False" IsReadOnly="True">
                         <DataGrid.ColumnHeaderStyle>
                             <Style TargetType="DataGridColumnHeader">
                                 <Setter Property="FontFamily" Value="SimHei"/>
@@ -383,12 +404,12 @@
                             </Style>
                         </DataGrid.ColumnHeaderStyle>
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="时间" Binding="{Binding Timestamp}" />
+                            <DataGridTextColumn Header="时间" Binding="{Binding Timestamp,StringFormat='yyyy-MM-dd HH:mm:ss'}" />
                             <DataGridTextColumn Header="姓名" Binding="{Binding Name}" />
                             <DataGridTextColumn Header="类型" Binding="{Binding RecordType}" />
-                            <DataGridTextColumn Header="金额" Binding="{Binding Money}" />
-                            <DataGridTextColumn Header="卡类型" Binding="{Binding CardType.TypeName}" />
-                            <DataGridTextColumn Header="余额" Binding="{Binding Balance}" />
+                            <DataGridTextColumn Header="金额" Binding="{Binding Money,StringFormat='F2'}" />
+                            <DataGridTextColumn Header="卡类型" Binding="{Binding CardTypeID}" />
+                            <DataGridTextColumn Header="余额" Binding="{Binding Balance,StringFormat='F2'}" />
                             <DataGridTextColumn Header="卡号" Binding="{Binding StudentID}" />
                             <DataGridTextColumn Header="备注" Binding="{Binding Remarks}" />
                         </DataGrid.Columns>
@@ -445,7 +466,33 @@
                 </Grid>
             </TabItem>
             <TabItem Header="设置">
-                
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <GroupBox Header="卡类型">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                <ColumnDefinition Width="1*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <ComboBox Grid.Column="0" Grid.Row="0" Margin="4" >
+                                <ComboBoxItem IsSelected="True">3</ComboBoxItem>
+                            </ComboBox>
+                            <Label Content="kdkk" Grid.Column="1" Grid.Row="0" Margin="4" />
+                        </Grid>
+                    </GroupBox>
+                </Grid>
             </TabItem>
         </TabControl>
     </Grid>
