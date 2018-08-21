@@ -34,6 +34,7 @@ namespace GUI
 
             Init_TimeUpdate_Timer();
 
+            LoadCardTypes();
             //Strudent_Date.DataContext = Core.Student;
             //Record_DataGrid.ItemsSource = Analysis.GetAllRecords();
         }
@@ -57,26 +58,9 @@ namespace GUI
             };
         }
 
-        private void OK_Button_Click(object sender, RoutedEventArgs e)
+        void LoadCardTypes()
         {
-            if (FindStudent())
-            {
-                if (Main_Tab.SelectedIndex == 1)
-                {
-                    if (SignIn())
-                    {
-                        Reward();
-                    }
-                }
-            }
-            Strudent_Date.DataContext = Core.Student;
-            StudentID_TextBox.Clear();
-        }
-        
-        private void EditOK_Button_Click(object sender, RoutedEventArgs e)
-        {
-            SaveStudent();
-            ToNotEditMode();
+            CardType_ComboBox.ItemsSource = Core.GetCardTypes();
         }
 
         enum MessageType
@@ -100,6 +84,22 @@ namespace GUI
             }
             Message_Display.Foreground = new SolidColorBrush(color);
             Message_Display.Text += '\n' + message;
+        }
+
+        private void OK_Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (FindStudent())
+            {
+                if (Main_Tab.SelectedIndex == 1)
+                {
+                    if (SignIn())
+                    {
+                        Reward();
+                    }
+                }
+            }
+            Strudent_Date.DataContext = Core.Student;
+            StudentID_TextBox.Clear();
         }
         bool FindStudent()
         {
@@ -250,14 +250,20 @@ namespace GUI
         }
         private void Edit_Button_Click(object sender, RoutedEventArgs e)
         {
-            if (StudentEdit.IsEnabled)
-                ToNotEditMode();
-            else
+            if (!StudentEdit.IsEnabled && Core.Student != null)
                 ToEditMode();
+            else
+                ToNotEditMode();
         }
         private void RefreshEdit_Button_Click(object sender, RoutedEventArgs e)
         {
             ReloadStudent();
+        }
+        private void EditOK_Button_Click(object sender, RoutedEventArgs e)
+        {
+            SaveStudent();
+            ReloadStudent();
+            ToNotEditMode();
         }
 
         private double InputMoney = 0;
@@ -594,7 +600,6 @@ namespace GUI
                 WithdrawEarning = Analysis.TotalWithdraw(d.Year, d.Month, d.Day),
             };
         }
-
         private void MonthAnalysis_Button_Click(object sender, RoutedEventArgs e)
         {
             DateTime d = DateTime.Now;
@@ -607,7 +612,6 @@ namespace GUI
                 WithdrawEarning = Analysis.TotalWithdraw(d.Year, d.Month),
             };
         }
-
         private void Analysis_Button_Click(object sender, RoutedEventArgs e)
         {
             DateTime begin = AnalysisBegin_DatePicker.SelectedDate ?? DateTime.Now;
@@ -620,6 +624,128 @@ namespace GUI
                 DepositEarning = Analysis.TotalDeposit(begin, end),
                 WithdrawEarning = Analysis.TotalWithdraw(begin, end),
             };
+        }
+
+        private void CardTypeAdd_Button_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                CardType cardType = (CardType)CardTypeEdit_ComboBox.SelectedValue;
+                cardType.CostPerLesson = cardType.MonthlyFee / cardType.MonthlyClass;
+                Core.AddCardType(cardType);
+                ShowMessage("添加卡类型成功", MessageType.Info);
+                return;
+            }
+            catch
+            {
+                ShowMessage("无法添加卡类型", MessageType.Error);
+                return;
+            }
+        }
+        private void CardTypeEdit_Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (CardTypeEdit.IsEnabled)
+            {
+                try
+                {
+                    CardType cardType = (CardType)CardTypeEdit_ComboBox.SelectedValue;
+                    cardType.CostPerLesson = cardType.MonthlyFee / cardType.MonthlyClass;
+                    Core.SaveCardType(cardType);
+                    ShowMessage("保存卡类型成功", MessageType.Info);
+                }
+                catch
+                {
+                    ShowMessage("保存失败", MessageType.Error);
+                }
+                LoadCardTypes();
+                CardTypeEdit.IsEnabled = false;
+                CardTypeEdit_Button.Content = "编辑";
+                return;
+            }
+            else
+            {
+                CardTypeEdit_Button.Content = "保存";
+                CardTypeEdit.IsEnabled = true;
+            }
+        }
+
+        private void QueryRecord_Button_Click(object sender, RoutedEventArgs e)
+        {
+            HashSet<string> vs = new HashSet<string>();
+            foreach (var c in QueryRecord_CheckBoxGroup.Children)
+            {
+                try
+                {
+                    CheckBox checkBox = (CheckBox)c;
+                    if (checkBox.IsChecked ?? false)
+                        vs.Add((string)checkBox.Content);
+                }
+                catch { }
+            }
+            List<Record> records;
+            if (QueryRecordAllStudents_CheckBox.IsChecked ?? false)
+            {
+                if (QueryRecordBegin_DatePicker.IsEnabled)
+                {
+                    records = Analysis.GetRecords(vs,
+                        QueryRecordBegin_DatePicker.SelectedDate ?? DateTime.Now,
+                        QueryRecordEnd_DatePicker.SelectedDate ?? DateTime.Now);
+                }
+                else
+                {
+                    records = Analysis.GetRecords(vs);
+                }
+            }
+            else
+            {
+                if (Core.Student == null)
+                {
+                    ShowMessage("请先选择学生", MessageType.Warning);
+                    return;
+                }
+
+                if (QueryRecordBegin_DatePicker.IsEnabled)
+                {
+                    records = Analysis.GetRecords(vs,Core.Student.StudentID,
+                        QueryRecordBegin_DatePicker.SelectedDate ?? DateTime.Now,
+                        QueryRecordEnd_DatePicker.SelectedDate ?? DateTime.Now);
+                }
+                else
+                {
+                    records = Analysis.GetRecords(vs, Core.Student.StudentID);
+                }
+            }
+            QueryRecordCount_Label.Content = records.Count;
+            Record_DataGrid.ItemsSource = records;
+        }
+        private void QueryRecordAllRecords_CheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            foreach (var c in QueryRecord_CheckBoxGroup.Children)
+            {
+                try
+                {
+                    ((CheckBox)c).IsChecked = true;
+                }
+                catch { }
+            }
+        }
+        private void QueryRecordAllRecords_CheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            foreach (var c in QueryRecord_CheckBoxGroup.Children)
+            {
+                try
+                {
+                    ((CheckBox)c).IsChecked = false;
+                }
+                catch { }
+            }
+        }
+
+        private void StudentData_Button_Click(object sender, RoutedEventArgs e)
+        {
+            List<Student> students=Analysis.GetAllStudents();
+            StudentDataCount_Label.Content = students.Count();
+            StudentData.ItemsSource = students;
         }
     }
 

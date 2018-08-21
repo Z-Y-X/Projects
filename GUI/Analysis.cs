@@ -453,12 +453,13 @@ namespace Core
         /// </summary>
         /// <param name="StudentID"></param>
         /// <returns></returns>
-        public Dictionary<string,List<Record>> GetRecords(long StudentID)
+        public Dictionary<string,List<Record>> GetRecordsDictionary(long StudentID)
         {
             Dictionary<string, List<Record>> dict;
             using (var db = new RecordContext())
             {
                 var query = from r in db.Records
+                            orderby r.RecordID descending
                             where r.StudentID == StudentID
                             //group r by r.RecordType into rg
                             select r;
@@ -467,6 +468,92 @@ namespace Core
                     .ToDictionary(k => k.Key, y => y.ToList());
             }
             return dict;
+        }
+        public List<Record> GetRecords(long StudentID)
+        {
+            List<Record> list;
+            using (var db = new RecordContext())
+            {
+                var query = from r in db.Records
+                            orderby r.RecordID descending
+                            where r.StudentID == StudentID
+                            select r;
+                list = query.ToList();
+            }
+            return list;
+        }
+        public List<Record> GetRecords(HashSet<string> vs, long StudentID)
+        {
+            List<Record> list;
+            using (var db = new RecordContext())
+            {
+                var query = from r in db.Records
+                            orderby r.RecordID descending
+                            where r.StudentID == StudentID
+                              && vs.Contains(r.RecordType)
+                            select r;
+                list = query.ToList();
+            }
+            return list;
+        }
+        public List<Record> GetRecords(HashSet<string> vs)
+        {
+            List<Record> list;
+            using (var db = new RecordContext())
+            {
+                var query = from r in db.Records
+                            orderby r.RecordID descending
+                            where vs.Contains(r.RecordType)
+                            select r;
+                list = query.ToList();
+            }
+            return list;
+        }
+        public List<Record> GetRecords(long StudentID, DateTime begin, DateTime end)
+        {
+            end = end.AddDays(1);
+            List<Record> list;
+            using (var db = new RecordContext())
+            {
+                var query = from r in db.Records
+                            orderby r.RecordID descending
+                            where r.StudentID == StudentID
+                               && begin <= r.Timestamp && r.Timestamp < end
+                            select r;
+                list = query.ToList();
+            }
+            return list;
+        }
+        public List<Record> GetRecords(HashSet<string> vs, long StudentID, DateTime begin, DateTime end)
+        {
+            end = end.AddDays(1);
+            List<Record> list;
+            using (var db = new RecordContext())
+            {
+                var query = from r in db.Records
+                            orderby r.RecordID descending
+                            where r.StudentID == StudentID
+                               && vs.Contains(r.RecordType)
+                               && begin <= r.Timestamp && r.Timestamp < end
+                            select r;
+                list = query.ToList();
+            }
+            return list;
+        }
+        public List<Record> GetRecords(HashSet<string> vs, DateTime begin, DateTime end)
+        {
+            end = end.AddDays(1);
+            List<Record> list;
+            using (var db = new RecordContext())
+            {
+                var query = from r in db.Records
+                            orderby r.RecordID descending
+                            where vs.Contains(r.RecordType)
+                               && begin <= r.Timestamp && r.Timestamp < end
+                            select r;
+                list = query.ToList();
+            }
+            return list;
         }
 
         public List<Student> GetAllStudents()
@@ -486,7 +573,8 @@ namespace Core
             using (var db = new RecordContext())
             {
                 var query = from r in db.Records
-                            select r;
+                            orderby r.RecordID descending
+                            select r; 
                 list = query.ToList();
             }
             return list;

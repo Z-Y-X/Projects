@@ -71,6 +71,15 @@ namespace Core
                 db.SaveChanges();
             }
         }
+        public void SaveCardType(CardType cardType)
+        {
+            using (var db = new StudentContext())
+            {
+                db.CardTypes.Attach(cardType);
+                ((System.Data.Entity.Infrastructure.IObjectContextAdapter)db).ObjectContext.ObjectStateManager.ChangeObjectState(cardType, EntityState.Modified);
+                db.SaveChanges();
+            }
+        }
         public List<CardType> GetCardTypes()
         {
             List<CardType> list;
@@ -391,6 +400,7 @@ namespace Core
         {
             using (var db = new StudentContext())
             {
+                student.CardType = null;
                 db.Students.Attach(student);
                 ((System.Data.Entity.Infrastructure.IObjectContextAdapter)db).ObjectContext.ObjectStateManager.ChangeObjectState(student, EntityState.Modified);
                 db.SaveChanges();
