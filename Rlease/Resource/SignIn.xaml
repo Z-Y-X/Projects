@@ -1,0 +1,116 @@
+﻿<FlowDocument xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  ColumnWidth="400" FontSize="16" FontFamily="等线,宋体"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" TextOptions.TextFormattingMode="Display">
+  <FlowDocument.Resources>
+    <Style TargetType="{x:Type Paragraph}">
+      <Setter Property="Margin" Value="1"/>
+    </Style>
+    <Style TargetType="{x:Type Table}">
+      <Setter Property="Margin" Value="0"/>
+    </Style>
+  </FlowDocument.Resources>
+  <Paragraph Margin="6" TextAlignment="Center">
+    心思路·寒墨书画
+  </Paragraph>
+  <Table FontSize="15">
+    <Table.Columns>
+      <TableColumn Width="50"></TableColumn>
+      <TableColumn Width="100"></TableColumn>
+    </Table.Columns>
+    <TableRowGroup>
+      <TableRow>
+        <TableCell>
+          <Paragraph FontSize="13">
+            学员
+          </Paragraph>
+        </TableCell>
+        <TableCell>
+          <Paragraph>
+            <Run Text="{Binding Student.CardType.TypeName,Mode=OneWay}"></Run>
+          </Paragraph>
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell>
+          <Paragraph FontSize="13">
+            姓名
+          </Paragraph>
+        </TableCell>
+        <TableCell>
+          <Paragraph>
+            <Run Text="{Binding Student.Name,Mode=OneWay}"></Run>
+          </Paragraph>
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell>
+          <Paragraph FontSize="13">
+            卡号
+          </Paragraph>
+        </TableCell>
+        <TableCell>
+          <Paragraph FontSize="13">
+            <Run Text="{Binding Student.StudentID,Mode=OneWay}"></Run>
+          </Paragraph>
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell>
+          <Paragraph FontSize="13">
+            卡表号
+          </Paragraph>
+        </TableCell>
+        <TableCell>
+          <Paragraph>
+            <Run Text="{Binding Student.CardID,Mode=OneWay}"></Run>
+          </Paragraph>
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell>
+          <Paragraph FontSize="13">
+            金额
+          </Paragraph>
+        </TableCell>
+        <TableCell>
+          <Paragraph>
+            <Run Text="{Binding Student.CardType.CostPerLesson,Mode=OneWay}"></Run>
+          </Paragraph>
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell>
+          <Paragraph FontSize="13">
+            余额
+          </Paragraph>
+        </TableCell>
+        <TableCell>
+          <Paragraph>
+            <Run Text="{Binding Student.Balance,Mode=OneWay}"></Run>
+          </Paragraph>
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell>
+          <Paragraph FontSize="13">
+            苹果
+          </Paragraph>
+        </TableCell>
+        <TableCell>
+          <Paragraph>
+            <Run Text="{Binding Student.Apple,Mode=OneWay}"></Run>
+          </Paragraph>
+        </TableCell>
+      </TableRow>
+    </TableRowGroup>
+  </Table>
+  <Paragraph TextAlignment="Center" FontSize="14">
+    <Run Text="{Binding Now,StringFormat='yyyy-MM-dd HH:mm:ss',Mode=OneWay}"></Run>
+  </Paragraph>
+  <Paragraph TextAlignment="Center" FontSize="12">
+    电话: 13614547911 13614547911
+  </Paragraph>
+  <Paragraph TextAlignment="Center" FontSize="12">
+    地址: 迎宾路166号心思路·寒墨书画
+  </Paragraph>
+</FlowDocument>
