@@ -78,8 +78,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AbnormalClosedWindow.xaml.cs">
+      <DependentUpon>AbnormalClosedWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="RecordContext.cs" />
     <Compile Include="StudentContext.cs" />
+    <Page Include="AbnormalClosedWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

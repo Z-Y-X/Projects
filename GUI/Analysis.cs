@@ -579,5 +579,17 @@ namespace Core
             }
             return list;
         }
+        public List<Record> GetSomeRecords(int n)
+        {
+            List<Record> list;
+            using (var db = new RecordContext())
+            {
+                var query = from r in db.Records
+                            orderby r.RecordID descending
+                            select r;
+                list = query.Take(n).ToList();
+            }
+            return list;
+        }
     }
 }

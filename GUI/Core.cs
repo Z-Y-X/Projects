@@ -51,7 +51,18 @@ namespace Core
 
                     Settings.Closed = false;
                     Settings.LastStartup = DateTime.Now;
+                    db.SaveChanges();
                 }
+            }
+        }
+
+        public void CloseCore()
+        {
+            using (var db = new StudentContext())
+            {
+                db.Settings.Attach(Settings);
+                Settings.Closed = true;
+                db.SaveChanges();
             }
         }
 
@@ -405,6 +416,17 @@ namespace Core
                 ((System.Data.Entity.Infrastructure.IObjectContextAdapter)db).ObjectContext.ObjectStateManager.ChangeObjectState(student, EntityState.Modified);
                 db.SaveChanges();
                 Record("编辑", student);//Fixed
+            }
+        }
+
+        public void NewStudent(long StudentID)
+        {
+            using (var db = new StudentContext())
+            {
+                Student = new Student { StudentID = StudentID };
+                db.Students.Add(student);
+                db.SaveChanges();
+                Record("开卡", student);//Fixed
             }
         }
 

@@ -26,7 +26,7 @@ namespace GUI
     {
         Analysis Analysis = new Analysis();
         Core.Core Core = new Core.Core();
-
+        Printer Printer = new Printer();
 
         public MainWindow()
         {
@@ -34,7 +34,20 @@ namespace GUI
 
             Init_TimeUpdate_Timer();
 
+            InitPrinter();
+
             LoadCardTypes();
+
+            if (!Core.LastNormalClosed)
+            {
+                new AbnormalClosedWindow().ShowDialog();
+                //string title = "未正常关闭";
+                //string msg = "上次软件没有正常关闭，请检查数据。";
+                //MessageBoxButton buttons = MessageBoxButton.OK;
+                //MessageBoxImage icon = MessageBoxImage.Warning;
+
+                //MessageBoxResult result = MessageBox.Show(msg, title, buttons, icon);
+            }
             //Strudent_Date.DataContext = Core.Student;
             //Record_DataGrid.ItemsSource = Analysis.GetAllRecords();
         }
@@ -90,6 +103,10 @@ namespace GUI
         {
             if (FindStudent())
             {
+                if (Core.Student.Balance < Core.Student.CardType.CostPerLesson * 2)//TODO
+                {
+                    Arrearage();
+                }
                 if (Main_Tab.SelectedIndex == 1)
                 {
                     if (SignIn())
@@ -124,6 +141,33 @@ namespace GUI
                         else
                         {
                             ShowMessage("没有找到卡号：" + studentID, MessageType.Warning);
+                            if (Properties.Settings.Default.AllowNewStudent)
+                            {
+                                bool ok = false;
+                                if (!Properties.Settings.Default.AutoNewStudent)
+                                {
+                                    string title = "这张卡没有被使用";
+                                    string msg = "录入新的学生学生信息？";
+                                    MessageBoxButton buttons = MessageBoxButton.YesNo;
+                                    MessageBoxImage icon = MessageBoxImage.Question;
+
+                                    MessageBoxResult result = MessageBox.Show(msg, title, buttons, icon);
+
+                                    ok = (result == MessageBoxResult.Yes);
+                                }
+                                else
+                                {
+                                    ok = true;
+                                }
+                                if (ok)
+                                {
+                                    if (NewStudent(studentID))
+                                    {
+                                        ToEditMode();
+                                        Main_Tab.SelectedIndex = 2;
+                                    }
+                                }
+                            }
                             return false;
                         }
                     }
@@ -172,9 +216,46 @@ namespace GUI
             {
                 if (Core.Student != null)
                 {
-                    Core.SignIn();
-                    ShowMessage("签到成功", MessageType.Info);
+                    if (!Core.HasSignIn)
+                    {
+                        Core.SignIn();
+                        ShowMessage("签到成功", MessageType.Info);
+                        if (!Printer.Print("签到", new { Core.Student, DateTime.Now }))
+                        {
+                            ShowMessage("小票打印失败", MessageType.Warning);
+                        }
+                        return true;
+                    }
+                    else if(Properties.Settings.Default.AllowSignInAgain)
+                    {
+                        bool ok = false;
+                        if (Properties.Settings.Default.AutoSignInAgain)
+                        {
+                            ok = true;
+                        }
+                        else
+                        {
+                            string title = "今天已经签过到了";
+                            string msg = "再次签到？";
+                            MessageBoxButton buttons = MessageBoxButton.YesNo;
+                            MessageBoxImage icon = MessageBoxImage.Question;
+
+                            MessageBoxResult result = MessageBox.Show(msg, title, buttons, icon);
+
+                            ok = (result == MessageBoxResult.Yes);
+                        }
+                        if (ok)
+                        {
+                            Core.SignIn();
+                            ShowMessage("重复签到成功", MessageType.Info);
+                            if (!Printer.Print("签到", new { Core.Student, DateTime.Now }))
+                            {
+                                ShowMessage("小票打印失败", MessageType.Warning);
+                            }
+                        }
+                    }
                     return true;
+
                 }
                 else
                 {
@@ -195,7 +276,10 @@ namespace GUI
                 if (Core.HasReward)
                 {
                     ShowMessage("可以兑换礼品", MessageType.Info);
-                    //TODO
+                    if (!Printer.Print("苹果", new { Core.Student, DateTime.Now }))
+                    {
+                        ShowMessage("小票打印失败", MessageType.Warning);
+                    }
                 }
                 return true;
             }
@@ -232,6 +316,28 @@ namespace GUI
             {
                 Core.ClearStudent();
                 Strudent_Date.DataContext = Core.Student;
+            }
+        }
+        bool NewStudent(long StudentID)
+        {
+            try
+            {
+                Core.NewStudent(StudentID);
+                ShowMessage("开卡成功", MessageType.Info);
+                return true;
+            }
+            catch
+            {
+                ShowMessage("开卡失败", MessageType.Error);
+                return false;
+            }
+        }
+        void Arrearage()
+        {
+            ShowMessage("请注意余额", MessageType.Warning);
+            if (!Printer.Print("余额", new { Core.Student, DateTime.Now }))
+            {
+                ShowMessage("小票打印失败", MessageType.Warning);
             }
         }
 
@@ -342,6 +448,10 @@ namespace GUI
                 {
                     ShowMessage(Core.Student.Name + " 交款 " + InputMoney.ToString("F2") + "元 成功", MessageType.Info);
                     ReloadStudent();
+                    if (!Printer.Print("充值", new { Core.Student, DateTime.Now }))
+                    {
+                        ShowMessage("小票打印失败", MessageType.Warning);
+                    }
                     return;
                 }
                 else
@@ -373,6 +483,10 @@ namespace GUI
                     {
                         ShowMessage(Core.Student.Name + " 取款 " + InputMoney.ToString("F2") + "元 成功", MessageType.Info);
                         ReloadStudent();
+                        if (!Printer.Print("取款", new { Core.Student, DateTime.Now }))
+                        {
+                            ShowMessage("小票打印失败", MessageType.Warning);
+                        }
                         return;
                     }
                     else
@@ -410,6 +524,10 @@ namespace GUI
                     {
                         ShowMessage(Core.Student.Name + " 消费 " + InputMoney.ToString("F2") + "元 成功", MessageType.Info);
                         ReloadStudent();
+                        if (!Printer.Print("消费", new { Core.Student, DateTime.Now }))
+                        {
+                            ShowMessage("小票打印失败", MessageType.Warning);
+                        }
                         return;
                     }
                     else
@@ -746,6 +864,56 @@ namespace GUI
             List<Student> students=Analysis.GetAllStudents();
             StudentDataCount_Label.Content = students.Count();
             StudentData.ItemsSource = students;
+        }
+
+        void InitPrinter()
+        {
+            LoadPrintDocument();
+            Printer_ComboBox.ItemsSource = Printer.PrintQueuesName;
+            Printer.UsingPrintQueueName = Properties.Settings.Default.SelectedPrinter;
+            //
+            //if(!Printer.Print("签到",new { Core.Student, DateTime.Now }))
+            //{
+            //    ShowMessage("小票打印失败", MessageType.Warning);
+            //}
+            //
+        }
+        void LoadPrintDocument()
+        {
+            try
+            {
+                Printer.LoadXamlDoc("../Resource/SignIn.xaml", "签到");
+                Printer.LoadXamlDoc("../Resource/Balance.xaml", "余额");
+                Printer.LoadXamlDoc("../Resource/Deposit.xaml", "充值");
+                Printer.LoadXamlDoc("../Resource/Apple.xaml", "苹果");
+                Printer.LoadXamlDoc("../Resource/Withdraw.xaml", "取款");
+                Printer.LoadXamlDoc("../Resource/Consume.xaml", "消费");
+            }
+            catch
+            {
+                ShowMessage("打印资源加载错误 可能无法正常打印", MessageType.Error);
+            }
+        }
+
+
+        private void SettingsSave_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.Save();
+        }
+
+        private void Printer_ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Printer.UsingPrintQueueName = (string)Printer_ComboBox.SelectedValue;
+        }
+
+        private void SettingsReset_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.Reset();
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            Core.CloseCore();
         }
     }
 

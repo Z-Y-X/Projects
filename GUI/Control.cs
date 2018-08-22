@@ -14,23 +14,6 @@ using Core;
 
 namespace GUI
 {
-    sealed class GUISettings : ApplicationSettingsBase
-
-    {
-        [DefaultSettingValue("127.0.0.1")]
-        public string Server
-        {
-            get { return (string)this["Server"]; }
-            set { this["Server"] = value; }
-        }
-
-        [DefaultSettingValue("21")]
-        public int Port
-        {
-            get { return (int)this["Port"]; }
-            set { this["Port"] = value; }
-        }
-    }
     class Printer
     {
         public Printer()
@@ -40,6 +23,7 @@ namespace GUI
                 .GetPrintQueues()
                 .FirstOrDefault(p => p.Name == "Microsoft XPS Document Writer");
             print.PrintTicket.PageMediaSize = new PageMediaSize(58.0 * 0.03937 * 96, 100.0 * 0.03937 * 96);
+            docs = new Dictionary<string, FlowDocument>();
         }
 
         private PrintDialog print;
@@ -51,6 +35,30 @@ namespace GUI
             get
             {
                 return new LocalPrintServer().GetPrintQueues().ToList();
+            }
+        }
+        public List<string> PrintQueuesName
+        {
+            get
+            {
+                var q = from p in new LocalPrintServer().GetPrintQueues()
+                        select p.Name;
+                return q.ToList();
+            }
+        }
+        public string UsingPrintQueueName
+        {
+            get
+            {
+                return printQueue.Name;
+            }
+            set
+            {
+                var q = from p in new LocalPrintServer().GetPrintQueues()
+                        where p.Name == value
+                        select p;
+                printQueue = q.FirstOrDefault();
+                print.PrintQueue = printQueue;
             }
         }
         public PrintQueue UsingPrintQueue
@@ -66,12 +74,18 @@ namespace GUI
             }
         }
 
-        public bool Print(string key)
+        public bool Print(string key, object data = null)
         {
             try
             {
                 FlowDocument document = docs[key];
-                print.PrintDocument(((IDocumentPaginatorSource)document).DocumentPaginator, key);
+                document.DataContext = data;
+                DocumentPaginator paginator = ((IDocumentPaginatorSource)document).DocumentPaginator;
+                paginator.PageSize = new Size(58.0 * 0.03937 * 96, 100.0 * 0.03937 * 96);
+                //A.Dispatcher.BeginInvoke(new PrintDocumentMethod(print.PrintDocument),
+                //    System.Windows.Threading.DispatcherPriority.ApplicationIdle,
+                //    paginator, key);
+                print.PrintDocument(paginator, key);
                 return true;
             }
             catch

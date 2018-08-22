@@ -4,8 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GUI"
+        xmlns:Properties="clr-namespace:GUI.Properties"
         mc:Ignorable="d"
-        Title="MainWindow" Height="650" Width="450" MinHeight="400" MinWidth="350">
+        Title="MainWindow" Height="650" Width="450" MinHeight="400" MinWidth="350" Closed="Window_Closed">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -65,7 +66,7 @@
                     <Label Grid.Column="1" Grid.Row="0" MinWidth="50" Margin="4" Content="{Binding Name}"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="学生">
+            <TabItem Header="信息" TabIndex="2">
                 <Grid x:Name="Strudent_Date" >
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"></RowDefinition>
@@ -89,7 +90,7 @@
                     </Grid.ColumnDefinitions>
                     <Label Content="姓名" Grid.Column="0" Grid.Row="0" Margin="4"/>
                     <TextBox x:Name="StudentEdit" Grid.Column="1" Grid.Row="0" MinWidth="50" Margin="4" Text="{Binding Name}" IsEnabled="False"/>
-                    <Label Content="卡号" Grid.Column="2" Grid.Row="0" Margin="4" />
+                    <Label Content="表号" Grid.Column="2" Grid.Row="0" Margin="4" />
                     <TextBox Grid.Column="3" Grid.Row="0" MinWidth="50" Margin="4" Text="{Binding CardID}" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEdit}"/>
                     <Label Content="卡号" Grid.Column="0" Grid.Row="1" Margin="4" />
                     <TextBox Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3" Margin="4" Text="{Binding StudentID}" IsEnabled="False"/>
@@ -483,12 +484,12 @@
                             <DataGridTextColumn Header="电话" Binding="{Binding PhoneNumber}" />
                             <DataGridTextColumn Header="性别" Binding="{Binding Sex}" />
                             <DataGridTextColumn Header="年龄" Binding="{Binding Age}" />
-                            <DataGridTextColumn Header="生日" Binding="{Binding Birthday}" />
+                            <DataGridTextColumn Header="生日" Binding="{Binding Birthday,StringFormat='yyyy-MM-dd'}" />
                             <DataGridTextColumn Header="学校" Binding="{Binding School}" />
                             <DataGridTextColumn Header="地址" Binding="{Binding Address}" />
                             <DataGridTextColumn Header="总充值" Binding="{Binding TotalMoney}" />
-                            <DataGridTextColumn Header="开卡时间" Binding="{Binding StartDate}" />
-                            <DataGridTextColumn Header="上次签到" Binding="{Binding LastSignIn}" />
+                            <DataGridTextColumn Header="开卡时间" Binding="{Binding StartDate,StringFormat='yyyy-MM-dd HH:mm:ss'}" />
+                            <DataGridTextColumn Header="上次签到" Binding="{Binding LastSignIn,StringFormat='yyyy-MM-dd HH:mm:ss'}" />
                             <DataGridTextColumn Header="备注" Binding="{Binding Remarks}" />
                         </DataGrid.Columns>
                     </DataGrid>
@@ -505,7 +506,7 @@
                         <ColumnDefinition Width="*"></ColumnDefinition>
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
-                    <GroupBox Header="卡类型">
+                    <GroupBox Header="卡类型" Grid.Column="0" Grid.Row="0" >
                         <Grid x:Name="CardTypeEdit_Data" DataContext="{Binding Path=SelectedValue,ElementName=CardTypeEdit_ComboBox}">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"></RowDefinition>
@@ -530,11 +531,34 @@
 
                             <Label Content="月费" Grid.Column="4" Grid.Row="1" Margin="2" />
                             <TextBox MinWidth="40" Grid.Column="5" Grid.Row="1" Margin="2"  IsEnabled="{Binding Path=IsEnabled,ElementName=CardTypeEdit}" Text="{Binding MonthlyFee}"/>
-                            <Label Content="名称" Grid.Column="6" Grid.Row="1" Margin="2" />
+                            <Label Content="名称" Grid.Column="6" Grid.Row="1" Margin="2" HorizontalAlignment="Right"/>
                             <TextBox MinWidth="40" Grid.Column="7" Grid.Row="1" Grid.ColumnSpan="2" Margin="2"  IsEnabled="{Binding Path=IsEnabled,ElementName=CardTypeEdit}" Text="{Binding TypeName}"/>
 
                             <Button x:Name="CardTypeAdd_Button" Content="添加" Grid.Column="6" Grid.Row="0" Grid.ColumnSpan="2" Margin="4" Click="CardTypeAdd_Button_Click" />
                             <Button x:Name="CardTypeEdit_Button" Content="编辑" Grid.Column="8" Grid.Row="0" Margin="4" Click="CardTypeEdit_Button_Click" />
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Header="设置" Grid.Column="0" Grid.Row="1">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="4*"></ColumnDefinition>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+
+                            <ComboBox x:Name="Printer_ComboBox" Grid.Column="0" Grid.Row="0" Margin="4" SelectedValue="{Binding Path=SelectedPrinter,Source={x:Static Properties:Settings.Default}}" SelectionChanged="Printer_ComboBox_SelectionChanged"/>
+                            <WrapPanel Grid.Column="0" Grid.Row="1" >
+                                <CheckBox Content="允许新卡" Grid.Column="0" Grid.Row="0" Margin="4" IsChecked="{Binding Path=AllowNewStudent,Source={x:Static Properties:Settings.Default}}"/>
+                                <CheckBox Content="自动新卡" Grid.Column="0" Grid.Row="0" Margin="4" IsChecked="{Binding Path=AutoNewStudent,Source={x:Static Properties:Settings.Default}}"/>
+                                <CheckBox Content="允许多次签到" Grid.Column="0" Grid.Row="0" Margin="4" IsChecked="{Binding Path=AllowSignInAgain,Source={x:Static Properties:Settings.Default}}"/>
+                                <CheckBox Content="自动多次签到" Grid.Column="0" Grid.Row="0" Margin="4" IsChecked="{Binding Path=AutoSignInAgain,Source={x:Static Properties:Settings.Default}}"/>
+                            </WrapPanel>
+                            <Button x:Name="SettingsSave_Button" Content="保存" Grid.Column="1" Grid.Row="0" Margin="4" Click="SettingsSave_Button_Click"/>
+                            <Button x:Name="SettingsReset_Button" Content="默认" Grid.Column="2" Grid.Row="0" Margin="4" Click="SettingsReset_Button_Click"/>
                         </Grid>
                     </GroupBox>
                 </Grid>
