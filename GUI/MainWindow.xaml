@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:GUI"
         xmlns:Properties="clr-namespace:GUI.Properties"
         mc:Ignorable="d"
-        Title="MainWindow" Height="650" Width="450" MinHeight="400" MinWidth="350" Closed="Window_Closed">
+        Title="学生管理程序" Height="650" Width="450" MinHeight="400" MinWidth="350" Closed="Window_Closed">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -63,7 +63,11 @@
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <Label Content="姓名" Grid.Column="0" Grid.Row="0" Margin="4"/>
-                    <Label Grid.Column="1" Grid.Row="0" MinWidth="50" Margin="4" Content="{Binding Name}"/>
+                    <Label Grid.Column="1" Grid.Row="0" MinWidth="50" Margin="4" Content="{Binding Name}" FontSize="16"/>
+                    <Label Content="余额" Grid.Column="0" Grid.Row="1" Margin="4"/>
+                    <Label Grid.Column="1" Grid.Row="1" MinWidth="5" Margin="4" Content="{Binding Balance}" FontSize="16"/>
+                    <Label Content="苹果" Grid.Column="0" Grid.Row="2" Margin="4"/>
+                    <Label Grid.Column="1" Grid.Row="2" MinWidth="50" Margin="4" Content="{Binding Apple}" FontSize="16"/>
                 </Grid>
             </TabItem>
             <TabItem Header="信息" TabIndex="2">

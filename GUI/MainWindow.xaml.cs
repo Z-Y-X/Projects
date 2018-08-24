@@ -74,6 +74,7 @@ namespace GUI
         void LoadCardTypes()
         {
             CardType_ComboBox.ItemsSource = Core.GetCardTypes();
+            CardType_ComboBox.SelectedValue = 1;
         }
 
         enum MessageType

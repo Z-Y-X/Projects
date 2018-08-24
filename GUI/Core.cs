@@ -155,7 +155,7 @@ namespace Core
                           where s.StudentID == StudentID
                           select s;
                 Student = query.FirstOrDefault();
-                if ((student?.CardType.CostPerLesson ?? 1) < 0)
+                if ((student?.CardType?.CostPerLesson ?? 1) < 0)
                     throw new Exception("Cost Error");//确保CardType已经加载
             }
             return (student != null);
@@ -173,7 +173,7 @@ namespace Core
                             where s.CardID == CardID
                             select s;
                 Student = query.FirstOrDefault();
-                if ((student?.CardType.CostPerLesson ?? 1) < 0)
+                if ((student?.CardType?.CostPerLesson ?? 1) < 0)
                     throw new Exception("Cost Error");//确保CardType已经加载
             }
             return (student != null);
@@ -193,7 +193,7 @@ namespace Core
                 Student = (query.Count() == 1) ?
                            query.FirstOrDefault()
                                            : null;
-                if ((student?.CardType.CostPerLesson ?? 1) < 0)
+                if ((student?.CardType?.CostPerLesson ?? 1) < 0)
                     throw new Exception("Cost Error");//确保CardType已经加载
             }
             return (student != null);
@@ -424,6 +424,7 @@ namespace Core
             using (var db = new StudentContext())
             {
                 Student = new Student { StudentID = StudentID };
+                student.CardTypeID = 1;
                 db.Students.Add(student);
                 db.SaveChanges();
                 Record("开卡", student);//Fixed

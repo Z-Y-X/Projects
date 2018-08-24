@@ -23,6 +23,7 @@ namespace GUI
                 .GetPrintQueues()
                 .FirstOrDefault(p => p.Name == "Microsoft XPS Document Writer");
             print.PrintTicket.PageMediaSize = new PageMediaSize(58.0 * 0.03937 * 96, 100.0 * 0.03937 * 96);
+            print.PrintTicket.PageBorderless = PageBorderless.Borderless;
             docs = new Dictionary<string, FlowDocument>();
         }
 
@@ -80,8 +81,10 @@ namespace GUI
             {
                 FlowDocument document = docs[key];
                 document.DataContext = data;
+                document.PagePadding = new Thickness(0);
                 DocumentPaginator paginator = ((IDocumentPaginatorSource)document).DocumentPaginator;
-                paginator.PageSize = new Size(58.0 * 0.03937 * 96, 100.0 * 0.03937 * 96);
+                //paginator.PageSize = new Size(58.0 * 0.03937 * 96, 100.0 * 0.03937 * 96);
+                paginator.PageSize = new Size(48.0 * 0.03937 * 96, 100.0 * 0.03937 * 96);
                 //A.Dispatcher.BeginInvoke(new PrintDocumentMethod(print.PrintDocument),
                 //    System.Windows.Threading.DispatcherPriority.ApplicationIdle,
                 //    paginator, key);
