@@ -15,7 +15,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 
 using Core;
-using System.Globalization;
+
 
 namespace GUI
 {
@@ -45,21 +45,24 @@ namespace GUI
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            Init_TimeUpdate_Timer();
+            Init_Timer();
 
             InitPrinter();
 
             LoadCardTypes();
         }
 
-        private DispatcherTimer time_update_timer;
-        private void Init_TimeUpdate_Timer()
+        private DispatcherTimer time_update_timer = new DispatcherTimer();
+        private void Init_Timer()
         {
-            time_update_timer = new DispatcherTimer();
             time_update_timer.Tick += TimeUpdate_Tick;
             time_update_timer.Interval = new TimeSpan(0, 0, 60);
             time_update_timer.IsEnabled = true;
             TimeUpdate_Tick(null, null);
+
+            messageTimer.Tick += MessageTimer_Tick;//init message timer
+
+            FindStudentTimer.Interval = TimeSpan.FromSeconds(60);
         }
         private void TimeUpdate_Tick(object sender, EventArgs e)
         {
@@ -77,42 +80,91 @@ namespace GUI
             CardType_ComboBox.SelectedValue = 1;
         }
 
+        static int MaxMessageSize = 4;
         enum MessageType
         {
-            Info,Warning,Error
+            Info = 2000,
+            Warning = 3000,
+            Error = 5000,
         }
+        List<Label> messageList = new List<Label>();
+        DispatcherTimer messageTimer = new DispatcherTimer();
         void ShowMessage(string message, MessageType type = MessageType.Info)
         {
-            Color color = new Color { A = 0xFF, R = 0x00, G = 0x00, B = 0x00 };
-            switch (type)
+            MessageAdd(message, type);
+            //Color color = new Color { A = 0xFF, R = 0x00, G = 0x00, B = 0x00 };
+            //switch (type)
+            //{
+            //    case MessageType.Warning:
+            //        color.R = 0xAA;
+            //        color.G = 0x88;
+            //        break;
+            //    case MessageType.Error:
+            //        color.R = 0xFF;
+            //        break;
+            //    default:
+            //        break;
+            //}
+            //Message_Display.Foreground = new SolidColorBrush(color);
+            //Message_Display.Text += '\n' + message;
+        }
+        void MessageAdd(string message, MessageType type = MessageType.Info)
+        {
+            messageTimer.Stop();
+
+            Label label = new Label
             {
-                case MessageType.Warning:
-                    color.R = 0xAA;
-                    color.G = 0x88;
-                    break;
-                case MessageType.Error:
-                    color.R = 0xFF;
-                    break;
-                default:
-                    break;
+                Content = message,
+                Tag = (int)type,
+                Style = Resources[type.ToString()] as Style,
+            };
+
+            MessageDisplay.Children.Insert(0, label);
+            while (MessageDisplay.Children.Count > MaxMessageSize)
+            {
+                messageList.Insert(0, (Label)MessageDisplay.Children[MaxMessageSize]);
+                MessageDisplay.Children.RemoveAt(MaxMessageSize);
             }
-            Message_Display.Foreground = new SolidColorBrush(color);
-            Message_Display.Text += '\n' + message;
+
+            messageTimer.Interval = TimeSpan.FromMilliseconds((int)type);
+            messageTimer.Start();
+        }
+        private void MessageTimer_Tick(object sender, EventArgs e)
+        {
+            messageTimer.Stop();
+            if (MessageDisplay.Children.Count > 1)
+            {
+                MessageDisplay.Children.RemoveAt(0);
+                messageTimer.Interval = TimeSpan.FromMilliseconds((int)((Label)MessageDisplay.Children[0]).Tag);
+                messageTimer.Start();
+                if (MessageDisplay.Children.Count < MaxMessageSize && messageList.Count > 0)
+                {
+                    MessageDisplay.Children.Add(messageList[0]);
+                    messageList.RemoveAt(0);
+                }
+            }
+            else
+            {
+                MessageDisplay.Children.RemoveAt(0);
+                //S.Children.Add(new Label { Content = "null" });
+            }
         }
 
+        DispatcherTimer FindStudentTimer = new DispatcherTimer();
         private void OK_Button_Click(object sender, RoutedEventArgs e)
         {
             if (FindStudent())
             {
-                if (Core.Student.Balance < Core.Student.CardType.CostPerLesson * 2)//TODO
-                {
-                    Arrearage();
-                }
                 if (Main_Tab.SelectedIndex == 1)
                 {
                     if (SignIn())
                     {
+                        if (Core.Student.Balance < Core.Student.CardType.CostPerLesson * 2)//TODO
+                        {
+                            Arrearage();
+                        }
                         Reward();
+                        ClearStudent();
                     }
                 }
             }
@@ -221,16 +273,13 @@ namespace GUI
                     {
                         Core.SignIn();
                         ShowMessage("签到成功", MessageType.Info);
-                        if (!Printer.Print("签到", new
+                        Print("签到", new
                         {
                             Core.Student,
                             DateTime.Now,
                             RemainderLesson = (Core.Student.Balance / Core.Student.CardType.CostPerLesson),
                             SignInString = "签到单"
-                        }))
-                        {
-                            ShowMessage("小票打印失败", MessageType.Warning);
-                        }
+                        });
                         return true;
                     }
                     else if(Properties.Settings.Default.AllowSignInAgain)
@@ -255,16 +304,13 @@ namespace GUI
                         {
                             Core.SignIn();
                             ShowMessage("重复签到成功", MessageType.Info);
-                            if (!Printer.Print("签到", new
+                            Print("签到", new
                             {
                                 Core.Student,
                                 DateTime.Now,
                                 RemainderLesson = (Core.Student.Balance / Core.Student.CardType.CostPerLesson),
                                 SignInString = "重复签到"
-                            }))
-                            {
-                                ShowMessage("小票打印失败", MessageType.Warning);
-                            }
+                            });
                         }
                     }
                     return true;
@@ -289,10 +335,7 @@ namespace GUI
                 if (Core.HasReward)
                 {
                     ShowMessage("可以兑换礼品", MessageType.Info);
-                    if (!Printer.Print("苹果", new { Core.Student, DateTime.Now }))
-                    {
-                        ShowMessage("小票打印失败", MessageType.Warning);
-                    }
+                    Print("苹果", new { Core.Student, DateTime.Now });
                 }
                 return true;
             }
@@ -348,17 +391,14 @@ namespace GUI
         void Arrearage()
         {
             ShowMessage("请注意余额", MessageType.Warning);
-            if (!Printer.Print("余额", new
+            Print("余额", new
             {
                 Core.Student,
                 DateTime.Now,
                 BalanceString = Core.Student.Balance >= 0 ?
                         string.Format("余额不多 剩余{0:F1}节课", Core.Student.Balance / Core.Student.CardType.CostPerLesson) :
                         string.Format("已欠费 欠费{0:F2}元", -Core.Student.Balance)
-            }))
-            {
-                ShowMessage("小票打印失败", MessageType.Warning);
-            }
+            });
         }
 
         void ToEditMode()
@@ -367,11 +407,17 @@ namespace GUI
             Edit_Button.Content = "取消";
             EditOK_Button.Visibility = Visibility.Visible;
         }
+        void ToEditMoreMode()
+        {
+            StudentEditMore.IsEnabled = true;
+        }
         void ToNotEditMode()
         {
             StudentEdit.IsEnabled = false;
             Edit_Button.Content = "编辑";
             EditOK_Button.Visibility = Visibility.Hidden;
+            StudentEditMore.IsEnabled = false;
+
             ReloadStudent();
         }
         private void Edit_Button_Click(object sender, RoutedEventArgs e)
@@ -391,9 +437,29 @@ namespace GUI
             ReloadStudent();
             ToNotEditMode();
         }
+        private void EditMore_Button_Click(object sender, RoutedEventArgs e)
+        {
+            string title = "编辑关键信息？";
+            string msg = "注意！你的编辑将涉及卡内金额，请谨慎处理！";
+            MessageBoxButton buttons = MessageBoxButton.YesNo;
+            MessageBoxImage icon = MessageBoxImage.Warning;
+
+            MessageBoxResult result = MessageBox.Show(msg, title, buttons, icon);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                ToEditMoreMode();
+            }
+        }
 
         private double InputMoney = 0;
         private bool InputMoneyLock = false;
+        private void DepositClearInput()
+        {
+            DepositMoney_TextBox.Text = string.Empty;
+            DepositMonth_TextBox.Text = string.Empty;
+            DepositLesson_TextBox.Text = string.Empty;
+        }
         private void DepositMoney_TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (InputMoneyLock)
@@ -468,17 +534,15 @@ namespace GUI
                 {
                     ShowMessage(Core.Student.Name + " 交款 " + InputMoney.ToString("F2") + "元 成功", MessageType.Info);
                     ReloadStudent();
-                    if (!Printer.Print("充值", new
+                    Print("充值", new
                     {
                         Core.Student,
                         DateTime.Now,
                         DepositMoney = InputMoney,
                         DepositMonth = (InputMoney / Core.Student.CardType.MonthlyFee),
                         DepositLesson = (InputMoney / Core.Student.CardType.CostPerLesson),
-                    }))
-                    {
-                        ShowMessage("小票打印失败", MessageType.Warning);
-                    }
+                    });
+                    DepositClearInput();
                     return;
                 }
                 else
@@ -490,6 +554,7 @@ namespace GUI
             catch
             {
                 ShowMessage("交款发生错误", MessageType.Error);
+                DepositClearInput();
                 ClearStudent();
                 return;
             }
@@ -510,10 +575,8 @@ namespace GUI
                     {
                         ShowMessage(Core.Student.Name + " 取款 " + InputMoney.ToString("F2") + "元 成功", MessageType.Info);
                         ReloadStudent();
-                        if (!Printer.Print("取款", new { Core.Student, DateTime.Now, WithdrawMoney = InputMoney }))
-                        {
-                            ShowMessage("小票打印失败", MessageType.Warning);
-                        }
+                        Print("取款", new { Core.Student, DateTime.Now, WithdrawMoney = InputMoney });
+                        DepositClearInput();
                         return;
                     }
                     else
@@ -525,12 +588,14 @@ namespace GUI
                 else
                 {
                     ShowMessage(Core.Student.Name + " 余额不足", MessageType.Warning);
+                    DepositClearInput();
                     return;
                 }
             }
             catch
             {
                 ShowMessage("取款发生错误", MessageType.Error);
+                DepositClearInput();
                 ClearStudent();
                 return;
             }
@@ -551,10 +616,8 @@ namespace GUI
                     {
                         ShowMessage(Core.Student.Name + " 消费 " + InputMoney.ToString("F2") + "元 成功", MessageType.Info);
                         ReloadStudent();
-                        if (!Printer.Print("消费", new { Core.Student, DateTime.Now, ConsumeMoney = InputMoney }))
-                        {
-                            ShowMessage("小票打印失败", MessageType.Warning);
-                        }
+                        Print("消费", new { Core.Student, DateTime.Now, ConsumeMoney = InputMoney });
+                        DepositClearInput();
                         return;
                     }
                     else
@@ -572,6 +635,7 @@ namespace GUI
             catch
             {
                 ShowMessage("消费发生错误", MessageType.Error);
+                DepositClearInput();
                 ClearStudent();
                 return;
             }
@@ -606,6 +670,7 @@ namespace GUI
                 if (Core.AddApple(InputApple))
                 {
                     ShowMessage(Core.Student.Name + " 奖励 " + InputApple + "个 苹果", MessageType.Info);
+                    Apple_TextBox.Text = string.Empty;
                     ReloadStudent();
                     return;
                 }
@@ -618,7 +683,8 @@ namespace GUI
             catch
             {
                 ShowMessage("奖励发生错误", MessageType.Error);
-                ClearStudent();
+                Apple_TextBox.Text = string.Empty;
+                ClearStudent(); 
                 return;
             }
         }
@@ -637,6 +703,7 @@ namespace GUI
                     if (Core.AddApple(-InputApple))
                     {
                         ShowMessage(Core.Student.Name + " 扣除 " + InputApple + "个 苹果", MessageType.Info);
+                        Apple_TextBox.Text = string.Empty;
                         ReloadStudent();
                         return;
                     }
@@ -655,6 +722,7 @@ namespace GUI
             catch
             {
                 ShowMessage("扣除发生错误", MessageType.Error);
+                Apple_TextBox.Text = string.Empty;
                 ClearStudent();
                 return;
             }
@@ -691,7 +759,8 @@ namespace GUI
                     ReloadStudent();
                     Core.RecordChangeStudentID(stuID, Core.Student.StudentID);
                     ShowMessage("记录已同步", MessageType.Info);
-                    return;
+                    NewStudentID_TextBox.Text = string.Empty;
+                    return; 
                 }
                 else
                 {
@@ -702,6 +771,7 @@ namespace GUI
             catch
             {
                 ShowMessage("换卡发生错误", MessageType.Error);
+                NewStudentID_TextBox.Text = string.Empty;
                 ClearStudent();
                 return;
             }
@@ -716,9 +786,22 @@ namespace GUI
             }
             try
             {
+                string title = "回收这张卡？";
+                string msg = "姓名：" + Core.Student.Name +
+                    "\n余额：" + Core.Student.Balance.ToString("F2") +
+                    "\n确定回收？";
+                MessageBoxButton buttons = MessageBoxButton.YesNo;
+                MessageBoxImage icon = MessageBoxImage.Question;
+
+                MessageBoxResult result = MessageBox.Show(msg, title, buttons, icon);
+
+                if (result != MessageBoxResult.Yes)
+                    return;
+
                 if (Core.RecoverCard())
                 {
                     ShowMessage(Core.Student.Name + " 回收成功", MessageType.Info);
+                    NewStudentID_TextBox.Text = string.Empty;
                     ClearStudent();
                     return;
                 }
@@ -731,6 +814,7 @@ namespace GUI
             catch
             {
                 ShowMessage("回收发生错误", MessageType.Error);
+                NewStudentID_TextBox.Text = string.Empty;
                 ClearStudent();
                 return;
             }
@@ -904,7 +988,11 @@ namespace GUI
                 }
             }
             QueryRecordCount_Label.Content = records.Count;
+            Record_DataGrid.ItemsSource = null;
             Record_DataGrid.ItemsSource = records;
+            GC.Collect();                   //Debug
+            GC.WaitForPendingFinalizers();  //Debug
+            GC.Collect();                   //Debug
         }
         private void QueryRecordAllRecords_CheckBox_Checked(object sender, RoutedEventArgs e)
         {
@@ -941,12 +1029,6 @@ namespace GUI
             LoadPrintDocument();
             Printer_ComboBox.ItemsSource = Printer.PrintQueuesName;
             Printer.UsingPrintQueueName = Properties.Settings.Default.SelectedPrinter;
-            //
-            //if(!Printer.Print("签到",new { Core.Student, DateTime.Now }))
-            //{
-            //    ShowMessage("小票打印失败", MessageType.Warning);
-            //}
-            //
         }
         void LoadPrintDocument()
         {
@@ -964,18 +1046,25 @@ namespace GUI
                 ShowMessage("打印资源加载错误 可能无法正常打印", MessageType.Error);
             }
         }
-
-
-        private void SettingsSave_Button_Click(object sender, RoutedEventArgs e)
+        void Print(string Key, object Data, string Remarks = null)
         {
-            Properties.Settings.Default.Save();
+            if (Properties.Settings.Default.AutoPrint)
+            {
+                if (!Printer.Print(Key, Data))
+                {
+                    ShowMessage((Remarks ?? string.Empty) + "小票打印失败", MessageType.Warning);
+                }
+            }
         }
-
         private void Printer_ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             Printer.UsingPrintQueueName = (string)Printer_ComboBox.SelectedValue;
         }
 
+        private void SettingsSave_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.Save();
+        }
         private void SettingsReset_Button_Click(object sender, RoutedEventArgs e)
         {
             Properties.Settings.Default.Reset();

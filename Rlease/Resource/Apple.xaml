@@ -39,9 +39,9 @@
     <Run Text="{Binding Now,StringFormat='yyyy-MM-dd HH:mm:ss',Mode=OneWay}"></Run>
   </Paragraph>
   <Paragraph TextAlignment="Center" FontSize="12">
-    13614547911 13614547911
+    13614547911 13945419511
   </Paragraph>
   <Paragraph TextAlignment="Center" FontSize="12">
-    迎宾路166号心思路·寒墨书画
+    迎宾路166号寒墨书画
   </Paragraph>
 </FlowDocument>

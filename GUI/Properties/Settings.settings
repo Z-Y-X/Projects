@@ -17,5 +17,11 @@
     <Setting Name="SelectedPrinter" Type="System.String" Scope="User">
       <Value Profile="(Default)">Microsoft XPS Document Writer</Value>
     </Setting>
+    <Setting Name="AutoPrint" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="FindStudentHoldOnTime" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">300</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

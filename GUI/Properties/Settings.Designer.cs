@@ -82,5 +82,29 @@ namespace GUI.Properties {
                 this["SelectedPrinter"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AutoPrint {
+            get {
+                return ((bool)(this["AutoPrint"]));
+            }
+            set {
+                this["AutoPrint"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("300")]
+        public double FindStudentHoldOnTime {
+            get {
+                return ((double)(this["FindStudentHoldOnTime"]));
+            }
+            set {
+                this["FindStudentHoldOnTime"] = value;
+            }
+        }
     }
 }
