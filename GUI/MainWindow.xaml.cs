@@ -32,24 +32,24 @@ namespace GUI
         {
             InitializeComponent();
 
+            if (!Core.LastNormalClosed)
+            {
+                new AbnormalClosedWindow().ShowDialog();
+            }
+            //Strudent_Date.DataContext = Core.Student;
+            //Record_DataGrid.ItemsSource = Analysis.GetAllRecords();
+        }
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            Core.CloseCore();
+        }
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
             Init_TimeUpdate_Timer();
 
             InitPrinter();
 
             LoadCardTypes();
-
-            if (!Core.LastNormalClosed)
-            {
-                new AbnormalClosedWindow().ShowDialog();
-                //string title = "未正常关闭";
-                //string msg = "上次软件没有正常关闭，请检查数据。";
-                //MessageBoxButton buttons = MessageBoxButton.OK;
-                //MessageBoxImage icon = MessageBoxImage.Warning;
-
-                //MessageBoxResult result = MessageBox.Show(msg, title, buttons, icon);
-            }
-            //Strudent_Date.DataContext = Core.Student;
-            //Record_DataGrid.ItemsSource = Analysis.GetAllRecords();
         }
 
         private DispatcherTimer time_update_timer;
@@ -221,7 +221,13 @@ namespace GUI
                     {
                         Core.SignIn();
                         ShowMessage("签到成功", MessageType.Info);
-                        if (!Printer.Print("签到", new { Core.Student, DateTime.Now }))
+                        if (!Printer.Print("签到", new
+                        {
+                            Core.Student,
+                            DateTime.Now,
+                            RemainderLesson = (Core.Student.Balance / Core.Student.CardType.CostPerLesson),
+                            SignInString = "签到单"
+                        }))
                         {
                             ShowMessage("小票打印失败", MessageType.Warning);
                         }
@@ -249,7 +255,13 @@ namespace GUI
                         {
                             Core.SignIn();
                             ShowMessage("重复签到成功", MessageType.Info);
-                            if (!Printer.Print("签到", new { Core.Student, DateTime.Now }))
+                            if (!Printer.Print("签到", new
+                            {
+                                Core.Student,
+                                DateTime.Now,
+                                RemainderLesson = (Core.Student.Balance / Core.Student.CardType.CostPerLesson),
+                                SignInString = "重复签到"
+                            }))
                             {
                                 ShowMessage("小票打印失败", MessageType.Warning);
                             }
@@ -336,7 +348,14 @@ namespace GUI
         void Arrearage()
         {
             ShowMessage("请注意余额", MessageType.Warning);
-            if (!Printer.Print("余额", new { Core.Student, DateTime.Now }))
+            if (!Printer.Print("余额", new
+            {
+                Core.Student,
+                DateTime.Now,
+                BalanceString = Core.Student.Balance >= 0 ?
+                        string.Format("余额不多 剩余{0:F1}节课", Core.Student.Balance / Core.Student.CardType.CostPerLesson) :
+                        string.Format("已欠费 欠费{0:F2}元", -Core.Student.Balance)
+            }))
             {
                 ShowMessage("小票打印失败", MessageType.Warning);
             }
@@ -449,7 +468,14 @@ namespace GUI
                 {
                     ShowMessage(Core.Student.Name + " 交款 " + InputMoney.ToString("F2") + "元 成功", MessageType.Info);
                     ReloadStudent();
-                    if (!Printer.Print("充值", new { Core.Student, DateTime.Now }))
+                    if (!Printer.Print("充值", new
+                    {
+                        Core.Student,
+                        DateTime.Now,
+                        DepositMoney = InputMoney,
+                        DepositMonth = (InputMoney / Core.Student.CardType.MonthlyFee),
+                        DepositLesson = (InputMoney / Core.Student.CardType.CostPerLesson),
+                    }))
                     {
                         ShowMessage("小票打印失败", MessageType.Warning);
                     }
@@ -484,7 +510,7 @@ namespace GUI
                     {
                         ShowMessage(Core.Student.Name + " 取款 " + InputMoney.ToString("F2") + "元 成功", MessageType.Info);
                         ReloadStudent();
-                        if (!Printer.Print("取款", new { Core.Student, DateTime.Now }))
+                        if (!Printer.Print("取款", new { Core.Student, DateTime.Now, WithdrawMoney = InputMoney }))
                         {
                             ShowMessage("小票打印失败", MessageType.Warning);
                         }
@@ -525,7 +551,7 @@ namespace GUI
                     {
                         ShowMessage(Core.Student.Name + " 消费 " + InputMoney.ToString("F2") + "元 成功", MessageType.Info);
                         ReloadStudent();
-                        if (!Printer.Print("消费", new { Core.Student, DateTime.Now }))
+                        if (!Printer.Print("消费", new { Core.Student, DateTime.Now, ConsumeMoney = InputMoney }))
                         {
                             ShowMessage("小票打印失败", MessageType.Warning);
                         }
@@ -658,10 +684,13 @@ namespace GUI
             }
             try
             {
+                long stuID = Core.Student.StudentID;
                 if (Core.ReplaceCard(InputNewStudentID))
                 {
                     ShowMessage(Core.Student.Name + " 换卡成功", MessageType.Info);
                     ReloadStudent();
+                    Core.RecordChangeStudentID(stuID, Core.Student.StudentID);
+                    ShowMessage("记录已同步", MessageType.Info);
                     return;
                 }
                 else
@@ -747,24 +776,53 @@ namespace GUI
 
         private void CardTypeAdd_Button_Click(object sender, RoutedEventArgs e)
         {
-            try
+            if (CardTypeEdit.IsEnabled)
             {
-                CardType cardType = (CardType)CardTypeEdit_ComboBox.SelectedValue;
-                cardType.CostPerLesson = cardType.MonthlyFee / cardType.MonthlyClass;
-                Core.AddCardType(cardType);
-                ShowMessage("添加卡类型成功", MessageType.Info);
-                return;
+                if (string.IsNullOrEmpty(CardTypeEdit.Text))
+                    return;
+
+                CardTypeAdd_Button.Content = "添加";
+                CardTypeEdit_Button.IsEnabled = true;
+                CardTypeCancel_Button.Visibility = Visibility.Hidden;
+                CardTypeEdit.IsEnabled = false;
+                try
+                {
+                    CardType cardType = (CardType)CardTypeEdit_ComboBox.SelectedValue;
+                    cardType.CostPerLesson = cardType.MonthlyFee / cardType.MonthlyClass;
+                    Core.AddCardType(cardType);
+
+                    ShowMessage("添加卡类型成功", MessageType.Info);
+                    LoadCardTypes();
+                    return;
+                }
+                catch
+                {
+                    LoadCardTypes();
+                    ShowMessage("无法添加卡类型", MessageType.Error);
+                    return;
+                }
             }
-            catch
+            else
             {
-                ShowMessage("无法添加卡类型", MessageType.Error);
-                return;
+                CardTypeAdd_Button.Content = "保存";
+                CardTypeEdit_Button.IsEnabled = false;
+                CardTypeCancel_Button.Visibility = Visibility.Visible;
+                CardTypeEdit.IsEnabled = true;
+
+                CardTypeEdit_ComboBox.SelectedIndex = 0;
             }
+
         }
         private void CardTypeEdit_Button_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrEmpty(CardTypeEdit.Text))
+                return;
             if (CardTypeEdit.IsEnabled)
             {
+                CardTypeEdit_Button.Content = "编辑";
+                CardTypeAdd_Button.IsEnabled = true;
+                CardTypeCancel_Button.Visibility = Visibility.Hidden;
+                CardTypeEdit.IsEnabled = false;
                 try
                 {
                     CardType cardType = (CardType)CardTypeEdit_ComboBox.SelectedValue;
@@ -777,15 +835,26 @@ namespace GUI
                     ShowMessage("保存失败", MessageType.Error);
                 }
                 LoadCardTypes();
-                CardTypeEdit.IsEnabled = false;
-                CardTypeEdit_Button.Content = "编辑";
                 return;
             }
             else
             {
                 CardTypeEdit_Button.Content = "保存";
+                CardTypeAdd_Button.IsEnabled = false;
+                CardTypeCancel_Button.Visibility = Visibility.Visible;
                 CardTypeEdit.IsEnabled = true;
             }
+        }
+        private void CardTypeCancel_Button_Click(object sender, RoutedEventArgs e)
+        {
+            LoadCardTypes();
+            CardTypeAdd_Button.Content = "添加";
+            CardTypeEdit_Button.Content = "编辑";
+            CardTypeAdd_Button.IsEnabled = true;
+            CardTypeEdit_Button.IsEnabled = true;
+            CardTypeCancel_Button.Visibility = Visibility.Hidden;
+            CardTypeEdit.IsEnabled = false;
+            CardTypeEdit_ComboBox.SelectedValue = null;
         }
 
         private void QueryRecord_Button_Click(object sender, RoutedEventArgs e)
@@ -912,10 +981,6 @@ namespace GUI
             Properties.Settings.Default.Reset();
         }
 
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            Core.CloseCore();
-        }
     }
 
     class AnalysisData

@@ -3,7 +3,7 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" TextOptions.TextFormattingMode="Display">
   <FlowDocument.Resources>
     <Style TargetType="{x:Type Paragraph}">
-      <Setter Property="Margin" Value="1"/>
+      <Setter Property="Margin" Value="0"/>
     </Style>
     <Style TargetType="{x:Type Table}">
       <Setter Property="Margin" Value="0"/>
@@ -12,9 +12,13 @@
   <Paragraph Margin="6" TextAlignment="Center">
     心思路·寒墨书画
   </Paragraph>
+  <Paragraph TextAlignment="Center" FontSize="14">
+    <Run Text="{Binding SignInString,Mode=OneWay}"></Run>
+  </Paragraph>
   <Table FontSize="15">
     <Table.Columns>
       <TableColumn Width="50"></TableColumn>
+      <TableColumn Width="25"></TableColumn>
       <TableColumn Width="100"></TableColumn>
     </Table.Columns>
     <TableRowGroup>
@@ -24,7 +28,7 @@
             学员
           </Paragraph>
         </TableCell>
-        <TableCell>
+        <TableCell ColumnSpan="2">
           <Paragraph>
             <Run Text="{Binding Student.CardType.TypeName,Mode=OneWay}"></Run>
           </Paragraph>
@@ -36,7 +40,7 @@
             姓名
           </Paragraph>
         </TableCell>
-        <TableCell>
+        <TableCell ColumnSpan="2">
           <Paragraph>
             <Run Text="{Binding Student.Name,Mode=OneWay}"></Run>
           </Paragraph>
@@ -48,7 +52,7 @@
             卡号
           </Paragraph>
         </TableCell>
-        <TableCell>
+        <TableCell ColumnSpan="2">
           <Paragraph FontSize="13">
             <Run Text="{Binding Student.StudentID,Mode=OneWay}"></Run>
           </Paragraph>
@@ -60,9 +64,9 @@
             卡表号
           </Paragraph>
         </TableCell>
-        <TableCell>
+        <TableCell ColumnSpan="2">
           <Paragraph>
-            <Run Text="{Binding Student.CardID,Mode=OneWay}"></Run>
+            <Run FontSize="14" Text="{Binding Student.CardID,Mode=OneWay}"></Run>
           </Paragraph>
         </TableCell>
       </TableRow>
@@ -72,9 +76,9 @@
             金额
           </Paragraph>
         </TableCell>
-        <TableCell>
+        <TableCell ColumnSpan="2">
           <Paragraph>
-            <Run Text="{Binding Student.CardType.CostPerLesson,Mode=OneWay}"></Run>
+            <Run Text="{Binding Student.CardType.CostPerLesson,StringFormat={}{0:F2}元,Mode=OneWay}"></Run>
           </Paragraph>
         </TableCell>
       </TableRow>
@@ -84,33 +88,33 @@
             余额
           </Paragraph>
         </TableCell>
-        <TableCell>
+        <TableCell ColumnSpan="2">
           <Paragraph>
-            <Run Text="{Binding Student.Balance,Mode=OneWay}"></Run>
+            <Run Text="{Binding Student.Balance,StringFormat={}{0:F2}元,Mode=OneWay}"></Run>
           </Paragraph>
         </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell>
-          <Paragraph FontSize="13">
-            苹果
+        <TableCell ColumnSpan="2">
+          <Paragraph TextAlignment="Center" FontSize="13">
+            <Run Text="{Binding Student.Apple,StringFormat=苹果{0},Mode=OneWay}"></Run>
           </Paragraph>
         </TableCell>
         <TableCell>
-          <Paragraph>
-            <Run Text="{Binding Student.Apple,Mode=OneWay}"></Run>
+          <Paragraph FontSize="13">
+            <Run Text="{Binding RemainderLesson,StringFormat=还剩{0:F1}节课,Mode=OneWay}"></Run>
           </Paragraph>
         </TableCell>
       </TableRow>
     </TableRowGroup>
   </Table>
-  <Paragraph TextAlignment="Center" FontSize="14">
+  <Paragraph TextAlignment="Center" FontSize="13">
     <Run Text="{Binding Now,StringFormat='yyyy-MM-dd HH:mm:ss',Mode=OneWay}"></Run>
   </Paragraph>
   <Paragraph TextAlignment="Center" FontSize="12">
-    电话: 13614547911 13614547911
+    13614547911 13614547911
   </Paragraph>
   <Paragraph TextAlignment="Center" FontSize="12">
-    地址: 迎宾路166号心思路·寒墨书画
+    迎宾路166号心思路·寒墨书画
   </Paragraph>
 </FlowDocument>

@@ -40,6 +40,16 @@ namespace Core
                     LastNormalClosed = true;
                     FirstStartup = true;
 
+                    CardType cardType = new CardType
+                    {
+                        CardTypeID = 1,
+                        CostPerLesson = 0,
+                        MonthlyClass = 0,
+                        MonthlyFee = 0,
+                        TypeName = "默认请修改"
+                    };
+                    db.CardTypes.Add(cardType);
+
                     Settings = new Setting();
                     db.Settings.Add(Settings);
                     db.SaveChanges();
@@ -66,6 +76,27 @@ namespace Core
             }
         }
 
+        //private void DefaultCardType()
+        //{
+        //    using (var db = new StudentContext())
+        //    {
+        //        var query = from c in db.CardTypes
+        //                    select c;
+        //        if (query.Count() == 0)
+        //        {
+        //            CardType cardType = new CardType
+        //            {
+        //                CardTypeID = 1,
+        //                CostPerLesson = 0,
+        //                MonthlyClass = 0,
+        //                MonthlyFee = 0,
+        //                TypeName = "默认请修改"
+        //            };
+        //            db.CardTypes.Add(cardType);
+        //            db.SaveChanges();
+        //        }
+        //    }
+        //}
         public void AddCardType(CardType cardType)
         {
             using (var db = new StudentContext())
@@ -517,6 +548,25 @@ namespace Core
             using (var db = new RecordContext())
             {
                 db.Records.Add(record);
+                db.SaveChanges();
+            }
+        }
+        /// <summary>
+        /// 修改记录中的学生ID号
+        /// </summary>
+        /// <param name="StudentID">原卡号</param>
+        /// <param name="NewStudentID">新卡号</param>
+        public void RecordChangeStudentID(long StudentID,long NewStudentID)
+        {
+            using (var db = new RecordContext())
+            {
+                var query = from r in db.Records
+                            where r.StudentID == StudentID
+                            select r;
+                foreach(var r in query)
+                {
+                    r.StudentID = NewStudentID;
+                }
                 db.SaveChanges();
             }
         }

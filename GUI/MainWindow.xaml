@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:GUI"
         xmlns:Properties="clr-namespace:GUI.Properties"
         mc:Ignorable="d"
-        Title="学生管理程序" Height="650" Width="450" MinHeight="400" MinWidth="350" Closed="Window_Closed">
+        Title="学生管理程序" Height="650" Width="450" MinHeight="400" MinWidth="350" Closed="Window_Closed" Loaded="Window_Loaded">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -42,7 +42,7 @@
                 <ColumnDefinition Width="*"></ColumnDefinition>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <CheckBox Content="？？？" Grid.Column="0" HorizontalAlignment="Left" VerticalContentAlignment="Center" Margin="2"/>
+            <CheckBox Content="     " Grid.Column="0" HorizontalAlignment="Left" VerticalContentAlignment="Center" Margin="2"/>
             <TextBox x:Name="StudentID_TextBox" Text="在此处输入卡号" Grid.Column="1" VerticalContentAlignment="Center" Margin="4"/>
             <Button x:Name="OK_Button" Content="确定" IsDefault="True" MinWidth="50" Grid.Column="2" HorizontalAlignment="Right" VerticalContentAlignment="Center"  Margin="2" Click="OK_Button_Click"/>
         </Grid>
@@ -62,12 +62,12 @@
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
-                    <Label Content="姓名" Grid.Column="0" Grid.Row="0" Margin="4"/>
-                    <Label Grid.Column="1" Grid.Row="0" MinWidth="50" Margin="4" Content="{Binding Name}" FontSize="16"/>
-                    <Label Content="余额" Grid.Column="0" Grid.Row="1" Margin="4"/>
-                    <Label Grid.Column="1" Grid.Row="1" MinWidth="5" Margin="4" Content="{Binding Balance}" FontSize="16"/>
-                    <Label Content="苹果" Grid.Column="0" Grid.Row="2" Margin="4"/>
-                    <Label Grid.Column="1" Grid.Row="2" MinWidth="50" Margin="4" Content="{Binding Apple}" FontSize="16"/>
+                    <Label Content="姓名" Grid.Column="0" Grid.Row="0" Margin="8"/>
+                    <Label Grid.Column="1" Grid.Row="0" MinWidth="50" Margin="8" Content="{Binding Name}" FontSize="16"/>
+                    <Label Content="余额" Grid.Column="0" Grid.Row="1" Margin="8"/>
+                    <Label Grid.Column="1" Grid.Row="1" MinWidth="5" Margin="8" Content="{Binding Balance}" FontSize="16"/>
+                    <Label Content="苹果" Grid.Column="0" Grid.Row="2" Margin="8"/>
+                    <Label Grid.Column="1" Grid.Row="2" MinWidth="50" Margin="8" Content="{Binding Apple}" FontSize="16"/>
                 </Grid>
             </TabItem>
             <TabItem Header="信息" TabIndex="2">
@@ -518,26 +518,27 @@
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
                                 <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                <ColumnDefinition Width="1*"></ColumnDefinition>
+                                <ColumnDefinition Width="1*"></ColumnDefinition>
                                 <ColumnDefinition Width="1*"></ColumnDefinition>
                                 <ColumnDefinition Width="1*"></ColumnDefinition>
                                 <ColumnDefinition Width="2*"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
-                            <ComboBox x:Name="CardTypeEdit_ComboBox" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" MinWidth="100" Margin="4" DisplayMemberPath="TypeName" ItemsSource="{Binding Path=ItemsSource,ElementName=CardType_ComboBox}"/>
-                            <Label Content="ID" Grid.Column="0" Grid.Row="1" Margin="2" />
+                            <ComboBox x:Name="CardTypeEdit_ComboBox" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="4" MinWidth="100" Margin="4" DisplayMemberPath="TypeName" ItemsSource="{Binding Path=ItemsSource,ElementName=CardType_ComboBox}"/>
+                            <Label Content="ID" Grid.Column="0" Grid.Row="1" Margin="1" HorizontalAlignment="Right"/>
                             <TextBox x:Name="CardTypeEdit" MinWidth="40" Grid.Column="1" Grid.Row="1" Margin="2" IsEnabled="False"  Text="{Binding CardTypeID}"/>
-                            <Label Content="月课程数" Grid.Column="2" Grid.Row="1" Margin="2" />
+                            <Label Content="课程" Grid.Column="2" Grid.Row="1" Margin="1" HorizontalAlignment="Right"/>
                             <TextBox MinWidth="40" Grid.Column="3" Grid.Row="1" Margin="2" IsEnabled="{Binding Path=IsEnabled,ElementName=CardTypeEdit}" Text="{Binding MonthlyClass}"/>
 
-                            <Label Content="月费" Grid.Column="4" Grid.Row="1" Margin="2" />
+                            <Label Content="月费" Grid.Column="4" Grid.Row="1" Margin="1" HorizontalAlignment="Right"/>
                             <TextBox MinWidth="40" Grid.Column="5" Grid.Row="1" Margin="2"  IsEnabled="{Binding Path=IsEnabled,ElementName=CardTypeEdit}" Text="{Binding MonthlyFee}"/>
-                            <Label Content="名称" Grid.Column="6" Grid.Row="1" Margin="2" HorizontalAlignment="Right"/>
+                            <Label Content="名称" Grid.Column="6" Grid.Row="1" Margin="1" HorizontalAlignment="Right"/>
                             <TextBox MinWidth="40" Grid.Column="7" Grid.Row="1" Grid.ColumnSpan="2" Margin="2"  IsEnabled="{Binding Path=IsEnabled,ElementName=CardTypeEdit}" Text="{Binding TypeName}"/>
 
+                            <Button x:Name="CardTypeCancel_Button" Content="取消" Grid.Column="4" Grid.Row="0" Grid.ColumnSpan="2" Margin="4" Visibility="Hidden" Click="CardTypeCancel_Button_Click" />
                             <Button x:Name="CardTypeAdd_Button" Content="添加" Grid.Column="6" Grid.Row="0" Grid.ColumnSpan="2" Margin="4" Click="CardTypeAdd_Button_Click" />
                             <Button x:Name="CardTypeEdit_Button" Content="编辑" Grid.Column="8" Grid.Row="0" Margin="4" Click="CardTypeEdit_Button_Click" />
                         </Grid>
@@ -555,7 +556,7 @@
                             </Grid.ColumnDefinitions>
 
                             <ComboBox x:Name="Printer_ComboBox" Grid.Column="0" Grid.Row="0" Margin="4" SelectedValue="{Binding Path=SelectedPrinter,Source={x:Static Properties:Settings.Default}}" SelectionChanged="Printer_ComboBox_SelectionChanged"/>
-                            <WrapPanel Grid.Column="0" Grid.Row="1" >
+                            <WrapPanel Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3">
                                 <CheckBox Content="允许新卡" Grid.Column="0" Grid.Row="0" Margin="4" IsChecked="{Binding Path=AllowNewStudent,Source={x:Static Properties:Settings.Default}}"/>
                                 <CheckBox Content="自动新卡" Grid.Column="0" Grid.Row="0" Margin="4" IsChecked="{Binding Path=AutoNewStudent,Source={x:Static Properties:Settings.Default}}"/>
                                 <CheckBox Content="允许多次签到" Grid.Column="0" Grid.Row="0" Margin="4" IsChecked="{Binding Path=AllowSignInAgain,Source={x:Static Properties:Settings.Default}}"/>
