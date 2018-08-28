@@ -106,5 +106,125 @@ namespace GUI.Properties {
                 this["FindStudentHoldOnTime"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool EnableBackground {
+            get {
+                return ((bool)(this["EnableBackground"]));
+            }
+            set {
+                this["EnableBackground"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("60")]
+        public double AutoClearStudentTime {
+            get {
+                return ((double)(this["AutoClearStudentTime"]));
+            }
+            set {
+                this["AutoClearStudentTime"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AutoClearStudent {
+            get {
+                return ((bool)(this["AutoClearStudent"]));
+            }
+            set {
+                this["AutoClearStudent"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool EnableBackup {
+            get {
+                return ((bool)(this["EnableBackup"]));
+            }
+            set {
+                this["EnableBackup"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("..\\Backup")]
+        public string BackupDirectory {
+            get {
+                return ((string)(this["BackupDirectory"]));
+            }
+            set {
+                this["BackupDirectory"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("32")]
+        public int StudentBackupSize {
+            get {
+                return ((int)(this["StudentBackupSize"]));
+            }
+            set {
+                this["StudentBackupSize"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("8")]
+        public int RecordBackupSize {
+            get {
+                return ((int)(this["RecordBackupSize"]));
+            }
+            set {
+                this["RecordBackupSize"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool TimingBackup {
+            get {
+                return ((bool)(this["TimingBackup"]));
+            }
+            set {
+                this["TimingBackup"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("600")]
+        public double StudentBackupInterval {
+            get {
+                return ((double)(this["StudentBackupInterval"]));
+            }
+            set {
+                this["StudentBackupInterval"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3600")]
+        public double RecordBackupInterval {
+            get {
+                return ((double)(this["RecordBackupInterval"]));
+            }
+            set {
+                this["RecordBackupInterval"] = value;
+            }
+        }
     }
 }

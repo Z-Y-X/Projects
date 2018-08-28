@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Printing;
 using System.Text;
@@ -9,7 +10,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Markup;
-
+using System.Windows.Threading;
 using Core;
 
 namespace GUI
@@ -161,6 +162,133 @@ namespace GUI
                 return true;
             }
             catch
+            {
+                return false;
+            }
+        }
+    }
+
+    class Backuper
+    {
+        private string backupDirectory;
+        private string backupFile;
+        private int maxSize;
+        private bool enable;
+        private bool autoBackup;
+        private DispatcherTimer timer = new DispatcherTimer();
+        public DateTime LastBackup { get; private set; } = DateTime.Now;
+        public TimeSpan LastBackupInterval
+        {
+            get
+            {
+                return DateTime.Now - LastBackup;
+            }
+        }
+        public TimeSpan BackupInterval { get; private set; }
+        public int Size
+        {
+            get
+            {
+                return (from s in Directory.GetFiles(backupDirectory)
+                        where s.EndsWith(".bak")
+                        select s).Count();
+            }
+        }
+        public bool IsEnable
+        {
+            get
+            {
+                return enable;
+            }
+            set
+            {
+                if (autoBackup)
+                    timer.IsEnabled = value;
+                enable = value;
+            }
+        }
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            Backup();
+        }
+
+        public Backuper(string BackupFile, string BackupDirectory, TimeSpan MinBackupInterval, int MaxSize = 10, bool AutoBackup = false)
+        {
+            if (!Directory.Exists(BackupDirectory))
+            {
+                Directory.CreateDirectory(BackupDirectory);
+            }
+            if (!BackupDirectory.EndsWith("\\"))
+            {
+                BackupDirectory += "\\";
+            }
+            backupFile = BackupFile;
+            backupDirectory = BackupDirectory;
+            BackupInterval = MinBackupInterval;
+            maxSize = MaxSize;
+            autoBackup = AutoBackup;
+
+            if (AutoBackup)
+            {
+                timer.Interval = MinBackupInterval + MinBackupInterval;
+                timer.Tick += Timer_Tick;
+                timer.Start();
+            }
+
+            enable = true;
+        }
+
+        public bool Backup(bool Force = false)
+        {
+            if (!enable || ((!Force && LastBackupInterval < BackupInterval) || !FileChanged()))
+                return false;
+
+            try
+            {
+                File.Copy(backupFile, backupDirectory + DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss") + ".bak");
+                DeleteUnnecessaryBackup();
+                LastBackup = DateTime.Now;
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        private void DeleteUnnecessaryBackup()
+        {
+            string[] files = Directory.GetFiles(backupDirectory);
+            List<string> list = new List<string>();
+            foreach (string s in files)
+            {
+                if (s.EndsWith(".bak"))
+                {
+                    list.Add(s);
+                }
+            }
+            list.Sort();
+            int count = list.Count();
+            for (int i = 0; i < count - maxSize; i++)
+            {
+                try
+                {
+                    File.Delete(list[i]);
+                    list.RemoveAt(i);
+                }
+                catch { }
+            }
+        }
+
+        private DateTime fileLastWriteTime;
+        private bool FileChanged()
+        {
+            FileInfo fileInfo = new FileInfo(backupFile);
+            if (fileInfo.LastWriteTime != fileLastWriteTime)
+            {
+                fileLastWriteTime = fileInfo.LastWriteTime;
+                return true;
+            }
+            else
             {
                 return false;
             }

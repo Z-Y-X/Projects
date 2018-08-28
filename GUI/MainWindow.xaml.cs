@@ -39,8 +39,14 @@ namespace GUI
             //Strudent_Date.DataContext = Core.Student;
             //Record_DataGrid.ItemsSource = Analysis.GetAllRecords();
         }
+        //private void Exit()
+        //{
+        //    Core.CloseCore();
+        //    Application.Current.Shutdown();
+        //}
         private void Window_Closed(object sender, EventArgs e)
         {
+            Backup(true);
             Core.CloseCore();
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -50,7 +56,56 @@ namespace GUI
             InitPrinter();
 
             LoadCardTypes();
+
+            InitNotifyIcon();
         }
+
+        System.Windows.Forms.NotifyIcon notifyIcon = new System.Windows.Forms.NotifyIcon();
+        private void InitNotifyIcon()
+        {
+            //设置托盘的各个属性
+            notifyIcon.BalloonTipText = "已转入后台运行";
+            notifyIcon.Text = "管理程序";
+            notifyIcon.Icon = new System.Drawing.Icon("notifyIcon.ico");
+            notifyIcon.Visible = true;
+            //notifyIcon.ShowBalloonTip(2000);
+            notifyIcon.MouseClick += new System.Windows.Forms.MouseEventHandler(NotifyIcon_MouseClick);
+
+            //退出菜单项
+            System.Windows.Forms.MenuItem exit = new System.Windows.Forms.MenuItem("退出");
+            exit.Click += new EventHandler(NotifyIconMenuExit_Click);
+
+            //关联托盘控件
+            System.Windows.Forms.MenuItem[] childen = new System.Windows.Forms.MenuItem[] { exit };
+            notifyIcon.ContextMenu = new System.Windows.Forms.ContextMenu(childen);
+        }
+        private void NotifyIcon_MouseClick(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            switch (e.Button)
+            {
+                case System.Windows.Forms.MouseButtons.Left:
+                    this.Visibility = Visibility.Visible;
+                    break;
+                //case System.Windows.Forms.MouseButtons.Right:
+                //    this.Visibility = Visibility.Hidden;
+                //    break;
+            }
+        }
+        private void NotifyIconMenuExit_Click(object sender, EventArgs e)
+        {
+            Application.Current.Shutdown();
+            //Close();
+        }
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (Properties.Settings.Default.EnableBackground)
+            {
+                Visibility = Visibility.Hidden;
+                e.Cancel = true;
+                notifyIcon.ShowBalloonTip(3000);
+            }
+        }
+
 
         private DispatcherTimer time_update_timer = new DispatcherTimer();
         private void Init_Timer()
@@ -62,7 +117,8 @@ namespace GUI
 
             messageTimer.Tick += MessageTimer_Tick;//init message timer
 
-            FindStudentTimer.Interval = TimeSpan.FromSeconds(60);
+            FindStudentTimer.Interval = TimeSpan.FromSeconds(Properties.Settings.Default.AutoClearStudentTime);
+            FindStudentTimer.Tick += FindStudentTimer_Tick;
         }
         private void TimeUpdate_Tick(object sender, EventArgs e)
         {
@@ -151,10 +207,29 @@ namespace GUI
         }
 
         DispatcherTimer FindStudentTimer = new DispatcherTimer();
+        private void FindStudentTimerEnable()
+        {
+            if (Properties.Settings.Default.AutoClearStudent)
+            {
+                FindStudentTimer.Stop();
+                FindStudentTimer.Start();
+            }
+        }
+        private void FindStudentTimerDisable()
+        {
+            FindStudentTimer.Stop();
+        }
+        private void FindStudentTimer_Tick(object sender, EventArgs e)
+        {
+            FindStudentTimer.Stop();
+            ClearStudent();
+        }
+
         private void OK_Button_Click(object sender, RoutedEventArgs e)
         {
             if (FindStudent())
             {
+                FindStudentTimerEnable();
                 if (Main_Tab.SelectedIndex == 1)
                 {
                     if (SignIn())
@@ -164,7 +239,6 @@ namespace GUI
                             Arrearage();
                         }
                         Reward();
-                        ClearStudent();
                     }
                 }
             }
@@ -406,6 +480,8 @@ namespace GUI
             StudentEdit.IsEnabled = true;
             Edit_Button.Content = "取消";
             EditOK_Button.Visibility = Visibility.Visible;
+
+            FindStudentTimerDisable();
         }
         void ToEditMoreMode()
         {
@@ -419,6 +495,7 @@ namespace GUI
             StudentEditMore.IsEnabled = false;
 
             ReloadStudent();
+            FindStudentTimerEnable();
         }
         private void Edit_Button_Click(object sender, RoutedEventArgs e)
         {
@@ -1070,6 +1147,40 @@ namespace GUI
             Properties.Settings.Default.Reset();
         }
 
+        private void Exit_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+
+        private Backuper StudentBackuper = new Backuper(@"..\Data\Student.db",
+            Properties.Settings.Default.BackupDirectory + @"\Backup\Student",
+            TimeSpan.FromSeconds(Properties.Settings.Default.StudentBackupInterval),
+            Properties.Settings.Default.StudentBackupSize,
+            Properties.Settings.Default.TimingBackup);
+        private Backuper RecordBackuper = new Backuper(@"..\Data\Record.db",
+            Properties.Settings.Default.BackupDirectory + @"\Backup\Record",
+            TimeSpan.FromSeconds(Properties.Settings.Default.RecordBackupInterval),
+            Properties.Settings.Default.RecordBackupSize,
+            Properties.Settings.Default.TimingBackup);
+        private void Backup(bool Force = false)
+        {
+            StudentBackuper.Backup(Force);
+            RecordBackuper.Backup(Force);
+        }
+        private void Window_Deactivated(object sender, EventArgs e)
+        {
+            Backup();
+        }
+
+        private void BackupDirectory_Button_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Forms.FolderBrowserDialog folder = new System.Windows.Forms.FolderBrowserDialog();
+            folder.Description = "选择备份存放目录";
+            if (folder.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                Properties.Settings.Default.BackupDirectory = folder.SelectedPath;
+            }
+        }
     }
 
     class AnalysisData
