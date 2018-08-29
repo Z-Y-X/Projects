@@ -212,11 +212,23 @@ namespace GUI
             Backup();
         }
 
+        public static string DefaultDirectory = "..\\";
         public Backuper(string BackupFile, string BackupDirectory, TimeSpan MinBackupInterval, int MaxSize = 10, bool AutoBackup = false)
         {
-            if (!Directory.Exists(BackupDirectory))
+            try
             {
-                Directory.CreateDirectory(BackupDirectory);
+                if (!Directory.Exists(BackupDirectory))
+                {
+                    Directory.CreateDirectory(BackupDirectory);
+                }
+            }
+            catch
+            {
+                BackupDirectory = DefaultDirectory;
+                if (!Directory.Exists(BackupDirectory))
+                {
+                    Directory.CreateDirectory(BackupDirectory);
+                }
             }
             if (!BackupDirectory.EndsWith("\\"))
             {
@@ -245,7 +257,7 @@ namespace GUI
 
             try
             {
-                File.Copy(backupFile, backupDirectory + DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss") + ".bak");
+                File.Copy(backupFile, backupDirectory + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".bak");
                 DeleteUnnecessaryBackup();
                 LastBackup = DateTime.Now;
                 return true;

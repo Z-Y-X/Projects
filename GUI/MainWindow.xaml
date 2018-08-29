@@ -177,7 +177,7 @@
                     <Label Content="学校" Grid.Column="0" Grid.Row="6" Margin="4" />
                     <TextBox Grid.Column="1" Grid.Row="6" MinWidth="50" Margin="4" Text="{Binding School}" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEdit}"/>
                     <Label Content="类型" Grid.Column="2" Grid.Row="6" Margin="4" />
-                    <ComboBox x:Name="CardType_ComboBox" Grid.Column="3" Grid.Row="6" MinWidth="50" Margin="4" DisplayMemberPath="TypeName" SelectedValuePath="CardTypeID" SelectedValue="{Binding CardTypeID}" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEditMore}"/>
+                    <ComboBox x:Name="CardType_ComboBox" Grid.Column="3" Grid.Row="6" MinWidth="50" Margin="4" DisplayMemberPath="TypeName" SelectedValuePath="CardTypeID" SelectedValue="{Binding CardTypeID}" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEdit}"/>
                     <Label Content="年龄" Grid.Column="0" Grid.Row="7" Margin="4" />
                     <TextBox Grid.Column="1" Grid.Row="7" MinWidth="50" Margin="4" Text="{Binding Age}" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEdit}"/>
                     <Label Content="总金" Grid.Column="2" Grid.Row="7" Margin="4" />
@@ -191,7 +191,7 @@
                         <ComboBoxItem>女</ComboBoxItem>
                     </ComboBox>
                     <Label Content="开卡" Grid.Column="0" Grid.Row="9" Margin="4" />
-                    <DatePicker Grid.Column="1" Grid.Row="9" MinWidth="50" Margin="4" Text="{Binding StartData}" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEditMore}"/>
+                    <DatePicker Grid.Column="1" Grid.Row="9" MinWidth="50" Margin="4" Text="{Binding StartDate}" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEditMore}"/>
                     <Label Content="上次" Grid.Column="2" Grid.Row="9" Margin="4" />
                     <DatePicker Grid.Column="3" Grid.Row="9" MinWidth="50" Margin="4" Text="{Binding LastSignIn,Mode=TwoWay}" IsEnabled="{Binding Path=IsEnabled,ElementName=StudentEditMore}"/>
                     <Label Content="备注" Grid.Column="0" Grid.Row="10" Margin="4" />
@@ -454,12 +454,13 @@
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
-                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="2*"></ColumnDefinition>
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
-                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
-                    <WrapPanel Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="4" Margin="2">
+                    <WrapPanel Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="4" Margin="2" VerticalAlignment="Center">
                         <CheckBox x:Name="QueryRecordAllStudents_CheckBox" Content="所有学生" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="4" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                         <CheckBox x:Name="QueryRecordAllRecords_CheckBox" Content="全部记录" Grid.Column="2" Grid.Row="0" Margin="4" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="QueryRecordAllRecords_CheckBox_Checked" Unchecked="QueryRecordAllRecords_CheckBox_Unchecked"/>
                         <CheckBox x:Name="QueryRecordUseDate_CheckBox" Content="使用区间" Grid.Column="3" Grid.Row="0" Margin="4" HorizontalAlignment="Left" VerticalAlignment="Center"/>
@@ -470,8 +471,9 @@
                     <Label Content="从" Grid.Column="0" Grid.Row="1" Margin="1" />
                     <DatePicker x:Name="QueryRecordBegin_DatePicker"  Grid.Column="1" Grid.Row="1" MinWidth="80" Margin="4" IsEnabled="{Binding Path=IsChecked,ElementName=QueryRecordUseDate_CheckBox}"/>
                     <Label Content="到" Grid.Column="2" Grid.Row="1" Margin="1" />
-                    <DatePicker x:Name="QueryRecordEnd_DatePicker" Grid.Column="3" Grid.Row="1" MinWidth="80" Margin="4"  IsEnabled="{Binding Path=IsChecked,ElementName=QueryRecordUseDate_CheckBox}"/>
-                    <Button x:Name="QueryRecord_Button" Content="查询" Grid.Column="4" Grid.Row="1" MinWidth="50" Margin="2" Click="QueryRecord_Button_Click"/>
+                    <DatePicker x:Name="QueryRecordEnd_DatePicker" Grid.Column="3" Grid.Row="1" Grid.ColumnSpan="2" MinWidth="80" Margin="4"  IsEnabled="{Binding Path=IsChecked,ElementName=QueryRecordUseDate_CheckBox}"/>
+                    <Button x:Name="QueryRecord_Button" Content="查询" Grid.Column="5" Grid.Row="0" MinWidth="50" MinHeight="28" Margin="2" Click="QueryRecord_Button_Click"/>
+                    <Button x:Name="QueryRecordClear_Button" Content="清除" Grid.Column="5" Grid.Row="1" MinWidth="50" MinHeight="28" Margin="2" Click="QueryRecordClear_Button_Click"/>
 
                     <WrapPanel x:Name="QueryRecord_CheckBoxGroup" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="99" Orientation="Horizontal" >
                         <CheckBox Content="签到" MinWidth="50" Margin="1"/>
@@ -515,25 +517,22 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="*"></RowDefinition>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
                         <ColumnDefinition Width="*"></ColumnDefinition>
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
-                        <ColumnDefinition Width="*"></ColumnDefinition>
-                        <ColumnDefinition Width="Auto"></ColumnDefinition>
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
 
-                    <CheckBox Content="所有学生" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="1" HorizontalAlignment="Left" VerticalAlignment="Center"
+                    <CheckBox Content="所有学生" Grid.Column="0" Grid.Row="0" Margin="1" HorizontalAlignment="Left" VerticalAlignment="Center"
                               IsChecked="True" IsEnabled="False"/>
-                    <Label x:Name="StudentDataCount_Label" Content="0" ContentStringFormat=" {0} 人" Grid.Column="3" Grid.Row="0" Margin="1" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                    <Button x:Name="StudentData_Button" Content="查询" Grid.Column="5" Grid.Row="0" MinWidth="50" Margin="2" Click="StudentData_Button_Click"/>
+                    <Label x:Name="StudentDataCount_Label" Content="0" ContentStringFormat=" {0} 人" Grid.Column="1" Grid.Row="0" Margin="1" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                    <Button x:Name="StudentDataClear_Button" Content="清除" Grid.Column="2" Grid.Row="0" MinWidth="50" MinHeight="28" Margin="2" Click="StudentDataClear_Button_Click"/>
+                    <Button x:Name="StudentData_Button" Content="查询" Grid.Column="3" Grid.Row="0" MinWidth="50" MinHeight="28" Margin="2" Click="StudentData_Button_Click"/>
 
-                    <DataGrid x:Name="StudentData"  Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="99" Margin="4" MinHeight="100"
+                    <DataGrid x:Name="StudentData"  Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="99" Margin="4" MinHeight="100"
                               AutoGenerateColumns="False" IsReadOnly="True">
                         <DataGrid.ColumnHeaderStyle>
                             <Style TargetType="DataGridColumnHeader">
@@ -661,7 +660,7 @@
                             </Grid.ColumnDefinitions>
                             <CheckBox Content="启用备份"  Grid.Column="0" Grid.Row="0" Margin="4" IsChecked="{Binding Path=EnableBackup,Source={x:Static Properties:Settings.Default}}"/>
                             <CheckBox Content="定时"  Grid.Column="1" Grid.Row="0" Margin="4" IsChecked="{Binding Path=TimingBackup,Source={x:Static Properties:Settings.Default}}"/>
-                            <TextBox  Grid.Column="2" Grid.Row="0" Text="{Binding Path=BackupDirectory,Source={x:Static Properties:Settings.Default}}" Margin="2" MinWidth="50" Grid.ColumnSpan="3"/>
+                            <TextBox  Grid.Column="2" Grid.Row="0" IsEnabled="False" Text="{Binding Path=BackupDirectory,Source={x:Static Properties:Settings.Default}}" Margin="2" MinWidth="50" Grid.ColumnSpan="3"/>
                             <Button x:Name="BackupDirectory_Button" Content="选择" Grid.Column="5" Grid.Row="0" Margin="2" MinWidth="40" Click="BackupDirectory_Button_Click"/>
                             <Label Content="学员：最大备份数量" Margin="0" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Right"/>
                             <TextBox Grid.Column="2" Grid.Row="1" Margin="2" MinWidth="30" Text="{Binding Path=StudentBackupSize,Source={x:Static Properties:Settings.Default}}"/>

@@ -446,7 +446,16 @@ namespace Core
                 db.Students.Attach(student);
                 ((System.Data.Entity.Infrastructure.IObjectContextAdapter)db).ObjectContext.ObjectStateManager.ChangeObjectState(student, EntityState.Modified);
                 db.SaveChanges();
-                Record("编辑", student);//Fixed
+                if (student.StartDate != new DateTime(630835470000000000))
+                {
+                    Record("编辑", student);//Fixed
+                }                                       // 我知道这段代码在我出生的瞬间不能正确执行
+                else                                    // 在我的代码里每一个新人与我同时诞生
+                {                                       // 但你开始的时间不能是我的生日
+                    student.StartDate = DateTime.Now;   // 我会让你重新开始
+                    Record("开卡", student);//Fixed
+                    db.SaveChanges();
+                }
             }
         }
 
@@ -455,10 +464,11 @@ namespace Core
             using (var db = new StudentContext())
             {
                 Student = new Student { StudentID = StudentID };
+                student.StartDate = new DateTime(630835470000000000);
                 student.CardTypeID = 1;
                 db.Students.Add(student);
                 db.SaveChanges();
-                Record("开卡", student);//Fixed
+                //Record("开卡", student);//Fixed
             }
         }
 

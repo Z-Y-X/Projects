@@ -46,8 +46,8 @@ namespace GUI
         //}
         private void Window_Closed(object sender, EventArgs e)
         {
-            Backup(true);
             Core.CloseCore();
+            Backup(true);
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -79,6 +79,11 @@ namespace GUI
             System.Windows.Forms.MenuItem[] childen = new System.Windows.Forms.MenuItem[] { exit };
             notifyIcon.ContextMenu = new System.Windows.Forms.ContextMenu(childen);
         }
+        private void Quit()
+        {
+            notifyIcon.Visible = false;
+            Application.Current.Shutdown();
+        }
         private void NotifyIcon_MouseClick(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             switch (e.Button)
@@ -93,8 +98,11 @@ namespace GUI
         }
         private void NotifyIconMenuExit_Click(object sender, EventArgs e)
         {
-            Application.Current.Shutdown();
-            //Close();
+            Quit();
+        }
+        private void Exit_Click(object sender, RoutedEventArgs e)
+        {
+            Quit();
         }
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -105,7 +113,6 @@ namespace GUI
                 notifyIcon.ShowBalloonTip(3000);
             }
         }
-
 
         private DispatcherTimer time_update_timer = new DispatcherTimer();
         private void Init_Timer()
@@ -252,88 +259,79 @@ namespace GUI
                 ShowMessage("请输入卡号", MessageType.Warning);
                 return false;
             }
-            else
+
+            long studentID = 0;
+            try
             {
-                long studentID = 0;
-                try
+                studentID = long.Parse(StudentID_TextBox.Text);
+                if (studentID > Core.Settings.CardIDMax)
                 {
-                    studentID = long.Parse(StudentID_TextBox.Text);
-                    if (studentID > Core.Settings.CardIDMax)
+                    if (Core.FindStudent(studentID))
                     {
-                        if (Core.FindStudent(studentID))
-                        {
-                            ShowMessage("欢迎 " + Core.Student.Name, MessageType.Info);
-                            return true;
-                        }
-                        else
-                        {
-                            ShowMessage("没有找到卡号：" + studentID, MessageType.Warning);
-                            if (Properties.Settings.Default.AllowNewStudent)
-                            {
-                                bool ok = false;
-                                if (!Properties.Settings.Default.AutoNewStudent)
-                                {
-                                    string title = "这张卡没有被使用";
-                                    string msg = "录入新的学生学生信息？";
-                                    MessageBoxButton buttons = MessageBoxButton.YesNo;
-                                    MessageBoxImage icon = MessageBoxImage.Question;
-
-                                    MessageBoxResult result = MessageBox.Show(msg, title, buttons, icon);
-
-                                    ok = (result == MessageBoxResult.Yes);
-                                }
-                                else
-                                {
-                                    ok = true;
-                                }
-                                if (ok)
-                                {
-                                    if (NewStudent(studentID))
-                                    {
-                                        ToEditMode();
-                                        Main_Tab.SelectedIndex = 2;
-                                    }
-                                }
-                            }
-                            return false;
-                        }
+                        ShowMessage("欢迎 " + Core.Student.Name, MessageType.Info);
+                        return true;
                     }
                     else
                     {
-                        if (Core.FindStudent((int)studentID))
-                        {
-                            ShowMessage("使用卡表号 " + Core.Student.Name, MessageType.Info);
-                            return true;
-                        }
-                        else
-                        {
-                            ShowMessage("没有找到卡表号：" + studentID, MessageType.Warning);
+                        ShowMessage("没有找到卡号：" + studentID, MessageType.Warning);
+                        if (!Properties.Settings.Default.AllowNewStudent)
                             return false;
+
+                        bool ok = Properties.Settings.Default.AutoNewStudent;
+                        if (!ok)
+                        {
+                            string title = "这张卡没有被使用";
+                            string msg = "录入新的学生学生信息？";
+                            MessageBoxButton buttons = MessageBoxButton.YesNo;
+                            MessageBoxImage icon = MessageBoxImage.Question;
+
+                            MessageBoxResult result = MessageBox.Show(msg, title, buttons, icon);
+
+                            ok = (result == MessageBoxResult.Yes);
                         }
+
+                        if (ok && NewStudent(studentID))
+                        {
+                            ToEditMode();
+                            Main_Tab.SelectedIndex = 2;
+                        }
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (Core.FindStudent((int)studentID))
+                    {
+                        ShowMessage("使用卡表号 " + Core.Student.Name, MessageType.Info);
+                        return true;
+                    }
+                    else
+                    {
+                        ShowMessage("没有找到卡表号：" + studentID, MessageType.Warning);
+                        return false;
+                    }
+                }
+            }
+            catch
+            {
+                try
+                {
+                    if (Core.FindStudent(StudentID_TextBox.Text))
+                    {
+                        ShowMessage("使用姓名 " + Core.Student.Name, MessageType.Info);
+                        return true;
+                    }
+                    else
+                    {
+                        ShowMessage("没有找到姓名 " + StudentID_TextBox.Text, MessageType.Warning);
+                        return false;
                     }
                 }
                 catch
                 {
-                    try
-                    {
-                        if (Core.FindStudent(StudentID_TextBox.Text))
-                        {
-                            ShowMessage("使用姓名 " + Core.Student.Name, MessageType.Info);
-                            return true;
-                        }
-                        else
-                        {
-                            ShowMessage("没有找到姓名 " + StudentID_TextBox.Text, MessageType.Warning);
-                            return false;
-                        }
-                    }
-                    catch
-                    {
-                        ShowMessage("查找学生发生错误", MessageType.Error);
-                        ClearStudent();
-                        return false;
-                    }
-
+                    ShowMessage("查找学生发生错误", MessageType.Error);
+                    ClearStudent();
+                    return false;
                 }
             }
         }
@@ -1093,12 +1091,28 @@ namespace GUI
                 catch { }
             }
         }
+        private void QueryRecordClear_Button_Click(object sender, RoutedEventArgs e)
+        {
+            QueryRecordCount_Label.Content = null;
+            Record_DataGrid.ItemsSource = null;
+            GC.Collect();                   //Debug
+            GC.WaitForPendingFinalizers();  //Debug
+            GC.Collect();                   //Debug
+        }
 
         private void StudentData_Button_Click(object sender, RoutedEventArgs e)
         {
             List<Student> students=Analysis.GetAllStudents();
             StudentDataCount_Label.Content = students.Count();
             StudentData.ItemsSource = students;
+        }
+        private void StudentDataClear_Button_Click(object sender, RoutedEventArgs e)
+        {
+            StudentDataCount_Label.Content = null;
+            StudentData.ItemsSource = null;
+            GC.Collect();                   //Debug
+            GC.WaitForPendingFinalizers();  //Debug
+            GC.Collect();                   //Debug
         }
 
         void InitPrinter()
@@ -1147,11 +1161,6 @@ namespace GUI
             Properties.Settings.Default.Reset();
         }
 
-        private void Exit_Click(object sender, RoutedEventArgs e)
-        {
-            Application.Current.Shutdown();
-        }
-
         private Backuper StudentBackuper = new Backuper(@"..\Data\Student.db",
             Properties.Settings.Default.BackupDirectory + @"\Backup\Student",
             TimeSpan.FromSeconds(Properties.Settings.Default.StudentBackupInterval),
@@ -1181,6 +1190,7 @@ namespace GUI
                 Properties.Settings.Default.BackupDirectory = folder.SelectedPath;
             }
         }
+
     }
 
     class AnalysisData

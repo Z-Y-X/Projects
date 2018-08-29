@@ -97,18 +97,6 @@ namespace GUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("300")]
-        public double FindStudentHoldOnTime {
-            get {
-                return ((double)(this["FindStudentHoldOnTime"]));
-            }
-            set {
-                this["FindStudentHoldOnTime"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool EnableBackground {
             get {
@@ -121,7 +109,7 @@ namespace GUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("60")]
+        [global::System.Configuration.DefaultSettingValueAttribute("30")]
         public double AutoClearStudentTime {
             get {
                 return ((double)(this["AutoClearStudentTime"]));
@@ -157,7 +145,7 @@ namespace GUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("..\\Backup")]
+        [global::System.Configuration.DefaultSettingValueAttribute("..\\")]
         public string BackupDirectory {
             get {
                 return ((string)(this["BackupDirectory"]));
@@ -169,7 +157,7 @@ namespace GUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("32")]
+        [global::System.Configuration.DefaultSettingValueAttribute("128")]
         public int StudentBackupSize {
             get {
                 return ((int)(this["StudentBackupSize"]));
@@ -181,7 +169,7 @@ namespace GUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("8")]
+        [global::System.Configuration.DefaultSettingValueAttribute("32")]
         public int RecordBackupSize {
             get {
                 return ((int)(this["RecordBackupSize"]));
