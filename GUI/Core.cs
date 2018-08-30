@@ -203,7 +203,9 @@ namespace Core
                 var query = from s in db.Students
                             where s.CardID == CardID
                             select s;
-                Student = query.FirstOrDefault();
+                Student = (query.Count() == 1) ?
+                           query.FirstOrDefault()
+                                           : null;
                 if ((student?.CardType?.CostPerLesson ?? 1) < 0)
                     throw new Exception("Cost Error");//确保CardType已经加载
             }

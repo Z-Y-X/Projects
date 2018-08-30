@@ -100,7 +100,7 @@
                 </TransformGroup>
             </StackPanel.RenderTransform>
         </StackPanel>
-        <Grid Height="30"  Grid.Row="2" Margin="2">
+        <Grid Grid.Row="2" Margin="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
@@ -109,8 +109,28 @@
                 <ColumnDefinition Width="*"></ColumnDefinition>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <CheckBox Content="     " Grid.Column="0" HorizontalAlignment="Left" VerticalContentAlignment="Center" Margin="2"/>
-            <TextBox x:Name="StudentID_TextBox" Text="在此处输入卡号" Grid.Column="1" VerticalContentAlignment="Center" Margin="4"/>
+            <Label Content="Lzy" Opacity="0.001" FontSize="16" Grid.Column="0" MinWidth="50" HorizontalAlignment="Left" VerticalContentAlignment="Center" Margin="2"/>
+            <TextBox x:Name="StudentID_TextBox" FontSize="16" Grid.Column="1" VerticalContentAlignment="Center" Margin="4">
+                <TextBox.Resources>
+                    <VisualBrush x:Key="HelpBrush" TileMode="None" Opacity="0.3" Stretch="None">
+                        <VisualBrush.Visual>
+                            <TextBlock Text="请输入卡号、卡表号或姓名"/>
+                        </VisualBrush.Visual>
+                    </VisualBrush>
+                </TextBox.Resources>
+                <TextBox.Style>
+                    <Style TargetType="TextBox">
+                        <Style.Triggers>
+                            <Trigger Property="Text" Value="{x:Null}">
+                                <Setter Property="Background" Value="{StaticResource HelpBrush}"/>
+                            </Trigger>
+                            <Trigger Property="Text" Value="">
+                                <Setter Property="Background" Value="{StaticResource HelpBrush}"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
             <Button x:Name="OK_Button" Content="确定" IsDefault="True" MinWidth="50" Grid.Column="2" HorizontalAlignment="Right" VerticalContentAlignment="Center"  Margin="2" Click="OK_Button_Click"/>
         </Grid>
         <TabControl x:Name="Main_Tab" Grid.Row="3" Margin="4">
@@ -400,24 +420,22 @@
                                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                                 <ColumnDefinition Width="*"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
-                            <Grid Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="99">
+                            <Grid Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="6">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="*"></RowDefinition>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                    <ColumnDefinition Width="7*"></ColumnDefinition>
-                                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                    <ColumnDefinition Width="7*"></ColumnDefinition>
                                     <ColumnDefinition Width="*"></ColumnDefinition>
-                                    <ColumnDefinition Width="4*"></ColumnDefinition>
+                                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
                                 </Grid.ColumnDefinitions>
                                 <Label Content="从" Grid.Column="0" Grid.Row="0" Margin="1" />
                                 <DatePicker x:Name="AnalysisBegin_DatePicker"  Grid.Column="1" Grid.Row="0" MinWidth="80" Margin="4"/>
                                 <Label Content="到" Grid.Column="2" Grid.Row="0" Margin="1" />
                                 <DatePicker x:Name="AnalysisEnd_DatePicker" Grid.Column="3" Grid.Row="0"  MinWidth="80" Margin="4" />
-                                <Button x:Name="Analysis_Button" Content="刷新" Grid.Column="5" MinWidth="50" Margin="4" Click="Analysis_Button_Click"/>
                             </Grid>
+                            <Button x:Name="Analysis_Button" Content="刷新" Grid.Column="6" MinWidth="50" Margin="4" Click="Analysis_Button_Click"/>
 
                             <Label Content="签到" Grid.Column="0" Grid.Row="1" Margin="4" />
                             <Label  Grid.Column="1" Grid.Row="1" MinWidth="50" Margin="4" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Content="{Binding SignInCount}"/>

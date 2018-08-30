@@ -146,39 +146,26 @@ namespace GUI
         static int MaxMessageSize = 4;
         enum MessageType
         {
-            Info = 2000,
-            Warning = 3000,
-            Error = 5000,
+            Info = 4000,
+            Warning = 5000,
+            Error = 6000,
+            Question = 4500,
+            None = 0,
         }
         List<Label> messageList = new List<Label>();
         DispatcherTimer messageTimer = new DispatcherTimer();
-        void ShowMessage(string message, MessageType type = MessageType.Info)
+        void ShowMessage(string message, MessageType type = MessageType.Info, int ms = 0)
         {
-            MessageAdd(message, type);
-            //Color color = new Color { A = 0xFF, R = 0x00, G = 0x00, B = 0x00 };
-            //switch (type)
-            //{
-            //    case MessageType.Warning:
-            //        color.R = 0xAA;
-            //        color.G = 0x88;
-            //        break;
-            //    case MessageType.Error:
-            //        color.R = 0xFF;
-            //        break;
-            //    default:
-            //        break;
-            //}
-            //Message_Display.Foreground = new SolidColorBrush(color);
-            //Message_Display.Text += '\n' + message;
+            MessageAdd(message, type, ms <= 0 ? (int)type : ms);
         }
-        void MessageAdd(string message, MessageType type = MessageType.Info)
+        void MessageAdd(string message, MessageType type, int ms)
         {
             messageTimer.Stop();
 
             Label label = new Label
             {
                 Content = message,
-                Tag = (int)type,
+                Tag = ms,
                 Style = Resources[type.ToString()] as Style,
             };
 
@@ -212,6 +199,89 @@ namespace GUI
                 //S.Children.Add(new Label { Content = "null" });
             }
         }
+        string ShowMessageBox(string ExTitle, string Title, string Content,
+            Color color = new Color(), string Ok = null, string Cancel = null)
+        {
+            FindStudentTimerDisable();
+            MessageWindow m = new MessageWindow(ExTitle, Title, Content, color, Ok, Cancel);
+            m.Owner = this;
+            m.ShowDialog();
+            FindStudentTimerEnable();
+            return m.Result;
+        }
+        string ShowMessageBox(MessageType type, string Title, string Content,
+            string Ok = null, string Cancel = null)
+        {
+            FindStudentTimerDisable();
+            string ExTitle = string.Empty;
+            Color color = new Color();
+            switch (type)
+            {
+                case MessageType.Error:
+                    ExTitle = "错误";
+                    color = Color.FromRgb(0xFF, 0x00, 0x00);
+                    break;
+                case MessageType.Warning:
+                    ExTitle = "警告";
+                    color = Color.FromRgb(0xFF, 0xBB, 0x00);
+                    break;
+                case MessageType.Question:
+                case MessageType.Info:
+                    ExTitle = "通知";
+                    color = Color.FromRgb(0xFF, 0x67, 0xC8);
+                    break;
+                case MessageType.None:
+                default:
+                    ExTitle = "提示";
+                    color = Color.FromRgb(0x00, 0x00, 0x00);
+                    break;
+            }
+            MessageWindow m = new MessageWindow(ExTitle,
+                 Title,
+                 Content,
+                 color,
+                 Ok, Cancel);
+            m.Owner = this;
+            m.ShowDialog();
+            FindStudentTimerEnable();
+            return m.Result;
+        }
+        string ShowMessageBox(string ExTitle, string Title, string Content, MessageType type,
+            string Ok = null, string Cancel = null)
+        {
+            FindStudentTimerDisable();
+            Color color = new Color();
+            switch (type)
+            {
+                case MessageType.Error:
+                    color = Color.FromRgb(0xFF, 0x00, 0x00);
+                    break;
+                case MessageType.Warning:
+                    color = Color.FromRgb(0xFF, 0xBB, 0x00);
+                    break;
+                case MessageType.Question:
+                    color = Color.FromRgb(0xFF, 0x67, 0xC8);
+                    break;
+                case MessageType.Info:
+                    color = Color.FromRgb(0xFF, 0xC8, 0x0A);
+                    break;
+                case MessageType.None:
+                    color = Color.FromRgb(0x00, 0x00, 0x00);
+                    break;
+                default:
+                    color = Color.FromRgb(0xAA, 0x00, 0xC8);
+                    break;
+            }
+            MessageWindow m = new MessageWindow(ExTitle,
+                 Title,
+                 Content,
+                 color,
+                 Ok, Cancel);
+            m.Owner = this;
+            m.ShowDialog();
+            FindStudentTimerEnable();
+            return m.Result;
+        }
 
         DispatcherTimer FindStudentTimer = new DispatcherTimer();
         private void FindStudentTimerEnable()
@@ -230,6 +300,9 @@ namespace GUI
         {
             FindStudentTimer.Stop();
             ClearStudent();
+            DepositClearInput();
+            AppleClearInput();
+            NewStudentIDClearInput();
         }
 
         private void OK_Button_Click(object sender, RoutedEventArgs e)
@@ -280,14 +353,11 @@ namespace GUI
                         bool ok = Properties.Settings.Default.AutoNewStudent;
                         if (!ok)
                         {
-                            string title = "这张卡没有被使用";
-                            string msg = "录入新的学生学生信息？";
-                            MessageBoxButton buttons = MessageBoxButton.YesNo;
-                            MessageBoxImage icon = MessageBoxImage.Question;
-
-                            MessageBoxResult result = MessageBox.Show(msg, title, buttons, icon);
-
-                            ok = (result == MessageBoxResult.Yes);
+                            ok = ShowMessageBox("新卡",
+                                    "这张卡没有被使用",
+                                    "录入新的学生学生信息？",
+                                    Color.FromRgb(0x05, 0xC8, 0x00),
+                                    "确定", "取消") == "确定";
                         }
 
                         if (ok && NewStudent(studentID))
@@ -363,14 +433,11 @@ namespace GUI
                         }
                         else
                         {
-                            string title = "今天已经签过到了";
-                            string msg = "再次签到？";
-                            MessageBoxButton buttons = MessageBoxButton.YesNo;
-                            MessageBoxImage icon = MessageBoxImage.Question;
-
-                            MessageBoxResult result = MessageBox.Show(msg, title, buttons, icon);
-
-                            ok = (result == MessageBoxResult.Yes);
+                            ok = ShowMessageBox("签到",
+                                    "今天已经签过到了",
+                                    "再次签到？",
+                                    Color.FromRgb(0x8D, 0xC8, 0x00),
+                                    "再次签到", "取消") == "再次签到";
                         }
                         if (ok)
                         {
@@ -484,6 +551,8 @@ namespace GUI
         void ToEditMoreMode()
         {
             StudentEditMore.IsEnabled = true;
+
+            FindStudentTimerDisable();
         }
         void ToNotEditMode()
         {
@@ -514,14 +583,12 @@ namespace GUI
         }
         private void EditMore_Button_Click(object sender, RoutedEventArgs e)
         {
-            string title = "编辑关键信息？";
-            string msg = "注意！你的编辑将涉及卡内金额，请谨慎处理！";
-            MessageBoxButton buttons = MessageBoxButton.YesNo;
-            MessageBoxImage icon = MessageBoxImage.Warning;
-
-            MessageBoxResult result = MessageBox.Show(msg, title, buttons, icon);
-
-            if (result == MessageBoxResult.Yes)
+            bool result = ShowMessageBox("编辑",
+                            "编辑关键信息？",
+                            "注意！你的编辑将涉及卡内金额，请谨慎处理！",
+                            Color.FromRgb(0xC8, 0x90, 0x00),
+                            "我知道", "取消") == "我知道";
+            if (result)
             {
                 ToEditMoreMode();
             }
@@ -535,7 +602,7 @@ namespace GUI
             DepositMonth_TextBox.Text = string.Empty;
             DepositLesson_TextBox.Text = string.Empty;
         }
-        private void DepositMoney_TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void DepositMoney_TextBox_Input()
         {
             if (InputMoneyLock)
                 return;
@@ -555,7 +622,7 @@ namespace GUI
                 Deposit_Button.IsEnabled = false;
             }
         }
-        private void DepositMonth_TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void DepositMonth_TextBox_Input()
         {
             if (InputMoneyLock)
                 return;
@@ -575,7 +642,7 @@ namespace GUI
                 Deposit_Button.IsEnabled = false;
             }
         }
-        private void DepositLesson_TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void DepositLesson_TextBox_Input()
         {
             if (InputMoneyLock)
                 return;
@@ -595,6 +662,18 @@ namespace GUI
                 Deposit_Button.IsEnabled = false;
             }
         }
+        private void DepositMoney_TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            DepositMoney_TextBox_Input();
+        }
+        private void DepositMonth_TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            DepositMonth_TextBox_Input();
+        }
+        private void DepositLesson_TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            DepositLesson_TextBox_Input();
+        }
         private void Deposit_Button_Click(object sender, RoutedEventArgs e)
         {
             if (Core.Student == null)
@@ -603,6 +682,13 @@ namespace GUI
                 ShowMessage("请先选择学生", MessageType.Warning);
                 return;
             }
+            if (ShowMessageBox("交款",
+                    Core.Student.Name+ " 交款",
+                    "姓名：" + Core.Student.Name +
+                    "\n交款：" + InputMoney.ToString("F2") + " 元",
+                    Color.FromRgb(0xBC, 0x79, 0x00),
+                    "交款", "取消") != "交款")
+                return;
             try
             {
                 if (Core.DepositMoney(InputMoney))
@@ -642,6 +728,13 @@ namespace GUI
                 ShowMessage("请先选择学生", MessageType.Warning);
                 return;
             }
+            if (ShowMessageBox("取款",
+                    Core.Student.Name + " 取款",
+                    "姓名：" + Core.Student.Name +
+                    "\n取款：" + InputMoney.ToString("F2") + " 元",
+                    Color.FromRgb(0x00, 0x61, 0xBC),
+                    "取款", "取消") != "取款")
+                return;
             try
             {
                 if (Core.Student.Balance >= InputMoney)
@@ -683,6 +776,13 @@ namespace GUI
                 ShowMessage("请先选择学生", MessageType.Warning);
                 return;
             }
+            if (ShowMessageBox("消费",
+                    Core.Student.Name + " 消费",
+                    "姓名：" + Core.Student.Name +
+                    "\n消费：" + InputMoney.ToString("F2") + " 元",
+                    Color.FromRgb(0x00, 0xBC, 0x53),
+                    "消费", "取消") != "消费")
+                return;
             try
             {
                 if (Core.Student.Balance >= InputMoney)
@@ -716,8 +816,11 @@ namespace GUI
             }
         }
 
-
         private int InputApple = 0;
+        private void AppleClearInput()
+        {
+            Apple_TextBox.Text = string.Empty;
+        }
         private void Apple_TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (Core.Student != null
@@ -740,12 +843,24 @@ namespace GUI
                 ShowMessage("请先选择学生", MessageType.Warning);
                 return;
             }
+            if (ShowMessageBox("奖励",
+                    "奖励 " + Core.Student.Name + " 苹果？",
+                    "姓名：" + Core.Student.Name +
+                    "\n奖励 " + InputApple + " 个苹果",
+                    Color.FromRgb(0xC8, 0x00, 0x89),
+                    "奖励", "取消") != "奖励")
+                return;
             try
             {
+                int apple = Core.Student.Apple;
                 if (Core.AddApple(InputApple))
                 {
+                    if (apple % 10 + InputApple >= 10)
+                    {
+                        Print("苹果", new { Core.Student, DateTime.Now });
+                    }
                     ShowMessage(Core.Student.Name + " 奖励 " + InputApple + "个 苹果", MessageType.Info);
-                    Apple_TextBox.Text = string.Empty;
+                    AppleClearInput();
                     ReloadStudent();
                     return;
                 }
@@ -758,7 +873,7 @@ namespace GUI
             catch
             {
                 ShowMessage("奖励发生错误", MessageType.Error);
-                Apple_TextBox.Text = string.Empty;
+                AppleClearInput();
                 ClearStudent(); 
                 return;
             }
@@ -771,6 +886,13 @@ namespace GUI
                 ShowMessage("请先选择学生", MessageType.Warning);
                 return;
             }
+            if (ShowMessageBox("扣除",
+                    "扣除 " + Core.Student.Name + " 苹果？",
+                    "姓名：" + Core.Student.Name +
+                    "\n扣除 " + InputApple + " 个苹果",
+                    Color.FromRgb(0x48, 0x00, 0x31),
+                    "扣除", "取消") != "扣除")
+                return;
             try
             {
                 if (InputApple <= Core.Student.Apple)
@@ -778,7 +900,7 @@ namespace GUI
                     if (Core.AddApple(-InputApple))
                     {
                         ShowMessage(Core.Student.Name + " 扣除 " + InputApple + "个 苹果", MessageType.Info);
-                        Apple_TextBox.Text = string.Empty;
+                        AppleClearInput();
                         ReloadStudent();
                         return;
                     }
@@ -797,13 +919,17 @@ namespace GUI
             catch
             {
                 ShowMessage("扣除发生错误", MessageType.Error);
-                Apple_TextBox.Text = string.Empty;
+                AppleClearInput();
                 ClearStudent();
                 return;
             }
         }
 
         private long InputNewStudentID = 0;
+        private void NewStudentIDClearInput()
+        {
+            NewStudentID_TextBox.Text = string.Empty;
+        }
         private void NewStudentID_TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (Core.Student != null
@@ -825,6 +951,13 @@ namespace GUI
                 ShowMessage("请先选择学生", MessageType.Warning);
                 return;
             }
+            if (ShowMessageBox("换卡",
+                       "为 " + Core.Student.Name + " 换卡？",
+                       "姓名：" + Core.Student.Name +
+                       "\n新卡号：" + InputNewStudentID,
+                       Color.FromRgb(0x62, 0x00, 0xC8),
+                       "换卡", "取消") != "换卡")
+                return;
             try
             {
                 long stuID = Core.Student.StudentID;
@@ -834,7 +967,7 @@ namespace GUI
                     ReloadStudent();
                     Core.RecordChangeStudentID(stuID, Core.Student.StudentID);
                     ShowMessage("记录已同步", MessageType.Info);
-                    NewStudentID_TextBox.Text = string.Empty;
+                    NewStudentIDClearInput();
                     return; 
                 }
                 else
@@ -846,7 +979,7 @@ namespace GUI
             catch
             {
                 ShowMessage("换卡发生错误", MessageType.Error);
-                NewStudentID_TextBox.Text = string.Empty;
+                NewStudentIDClearInput();
                 ClearStudent();
                 return;
             }
@@ -861,22 +994,20 @@ namespace GUI
             }
             try
             {
-                string title = "回收这张卡？";
-                string msg = "姓名：" + Core.Student.Name +
-                    "\n余额：" + Core.Student.Balance.ToString("F2") +
-                    "\n确定回收？";
-                MessageBoxButton buttons = MessageBoxButton.YesNo;
-                MessageBoxImage icon = MessageBoxImage.Question;
+                bool result = ShowMessageBox("回收",
+                                "回收这张卡？",
+                                "姓名：" + Core.Student.Name +
+                                   "\n余额：" + Core.Student.Balance.ToString("F2"),
+                                Color.FromRgb(0xC8, 0x90, 0x00),
+                                "回收", "取消") == "回收";
 
-                MessageBoxResult result = MessageBox.Show(msg, title, buttons, icon);
-
-                if (result != MessageBoxResult.Yes)
+                if (!result)
                     return;
 
                 if (Core.RecoverCard())
                 {
                     ShowMessage(Core.Student.Name + " 回收成功", MessageType.Info);
-                    NewStudentID_TextBox.Text = string.Empty;
+                    NewStudentIDClearInput();
                     ClearStudent();
                     return;
                 }
@@ -889,7 +1020,7 @@ namespace GUI
             catch
             {
                 ShowMessage("回收发生错误", MessageType.Error);
-                NewStudentID_TextBox.Text = string.Empty;
+                NewStudentIDClearInput();
                 ClearStudent();
                 return;
             }
@@ -1068,6 +1199,8 @@ namespace GUI
             GC.Collect();                   //Debug
             GC.WaitForPendingFinalizers();  //Debug
             GC.Collect();                   //Debug
+
+            ShowMessage("找到记录共 " + records.Count + " 条", MessageType.Info);
         }
         private void QueryRecordAllRecords_CheckBox_Checked(object sender, RoutedEventArgs e)
         {
@@ -1105,6 +1238,8 @@ namespace GUI
             List<Student> students=Analysis.GetAllStudents();
             StudentDataCount_Label.Content = students.Count();
             StudentData.ItemsSource = students;
+
+            ShowMessage("找到学员共 " + students.Count() + " 人", MessageType.Info);
         }
         private void StudentDataClear_Button_Click(object sender, RoutedEventArgs e)
         {
@@ -1155,10 +1290,12 @@ namespace GUI
         private void SettingsSave_Button_Click(object sender, RoutedEventArgs e)
         {
             Properties.Settings.Default.Save();
+            ShowMessage("设置已保存", MessageType.Info);
         }
         private void SettingsReset_Button_Click(object sender, RoutedEventArgs e)
         {
             Properties.Settings.Default.Reset();
+            ShowMessage("设置已恢复默认", MessageType.Info);
         }
 
         private Backuper StudentBackuper = new Backuper(@"..\Data\Student.db",
