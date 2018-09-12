@@ -230,12 +230,9 @@ namespace GUI
                     Directory.CreateDirectory(BackupDirectory);
                 }
             }
-            if (!BackupDirectory.EndsWith("\\"))
-            {
-                BackupDirectory += "\\";
-            }
-            backupFile = BackupFile;
-            backupDirectory = BackupDirectory;
+
+            backupFile = Path.GetFullPath(BackupFile);
+            backupDirectory = Path.GetFullPath(BackupDirectory);
             BackupInterval = MinBackupInterval;
             maxSize = MaxSize;
             autoBackup = AutoBackup;
@@ -257,7 +254,8 @@ namespace GUI
 
             try
             {
-                File.Copy(backupFile, backupDirectory + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".bak");
+                File.Copy(backupFile,
+                    Path.Combine(backupDirectory, DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".bak"));
                 DeleteUnnecessaryBackup();
                 LastBackup = DateTime.Now;
                 return true;

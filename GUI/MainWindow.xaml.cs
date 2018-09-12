@@ -146,19 +146,20 @@ namespace GUI
         static int MaxMessageSize = 4;
         enum MessageType
         {
-            Info = 4000,
-            Warning = 5000,
-            Error = 6000,
-            Question = 4500,
+            Info = 1000,
+            Warning = 1250,
+            Error = 1500,
+            Question = 1125,
             None = 0,
         }
         List<Label> messageList = new List<Label>();
         DispatcherTimer messageTimer = new DispatcherTimer();
         void ShowMessage(string message, MessageType type = MessageType.Info, int ms = 0)
         {
-            MessageAdd(message, type, ms <= 0 ? (int)type : ms);
+            int time = ms <= 0 ? (int)type : ms;
+            MessageAdd(message, type, time, time * 4);
         }
-        void MessageAdd(string message, MessageType type, int ms)
+        void MessageAdd(string message, MessageType type, int ms, int firstms)
         {
             messageTimer.Stop();
 
@@ -176,7 +177,7 @@ namespace GUI
                 MessageDisplay.Children.RemoveAt(MaxMessageSize);
             }
 
-            messageTimer.Interval = TimeSpan.FromMilliseconds((int)type);
+            messageTimer.Interval = TimeSpan.FromMilliseconds(firstms);
             messageTimer.Start();
         }
         private void MessageTimer_Tick(object sender, EventArgs e)
